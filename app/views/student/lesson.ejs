@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>LMS</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/student/lesson.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+    
+    <!-- SIDEBAR SINH VIÊN -->
+    <%- include('../partials/student-sidebar', { active: 'dashboard' }) %>
+
+    <!-- VÙNG NỘI DUNG CHÍNH -->
+    <main class="admin-main">
+      
+      <!-- BREADCRUMBS ĐIỀU HƯỚNG TRỰC QUAN -->
+      <nav class="breadcrumbs-bar" aria-label="Điều hướng bài học">
+        <a href="/student/dashboard">Bảng học tập</a>
+        <span>&rsaquo;</span>
+        <a href="/courses/<%= course.id %>"><%= course.title %></a>
+        <span>&rsaquo;</span>
+        <span style="color: var(--text-title); font-weight: 600;">Bài <%= lesson.lesson_order %></span>
+      </nav>
+
+      <!-- TOP HEADER -->
+      <header class="top-header" style="margin-bottom: 24px;">
+        <div class="header-title">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+            <code class="id-pill">Bài <%= lesson.lesson_order %> / <%= allLessons.length %></code>
+            <% if (isCurrentDone) { %>
+              <span class="lesson-status-pill done">
+                <svg style="width:12px;height:12px;stroke:currentColor;stroke-width:2.5;fill:none" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>Đã hoàn thành</span>
+              </span>
+            <% } else { %>
+              <span class="lesson-status-pill pending">
+                <span>Đang học</span>
+              </span>
+            <% } %>
+          </div>
+          <h1><%= lesson.title %></h1>
+        </div>
+        <div class="header-actions">
+          <a href="/courses/<%= course.id %>" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg style="width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            <span>Mục lục khóa học</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- THÔNG BÁO HOÀN THÀNH KHÓA HỌC / BÀI HỌC -->
+      <% if (typeof courseCompletedAlert !== 'undefined' && courseCompletedAlert) { %>
+        <div class="course-completed-celebration" style="margin-bottom: 28px; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 2px solid #10b981; border-radius: 14px; padding: 22px 26px; box-shadow: 0 4px 18px rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 54px; height: 54px; border-radius: 12px; background: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2); flex-shrink: 0;">
+              🎓
+            </div>
+            <div>
+              <div style="font-size: 0.78rem; font-weight: 700; color: #047857; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px;">
+                🎉 CHÚC MỪNG BẠN ĐÃ HOÀN THÀNH TOÀN BỘ KHÓA HỌC!
+              </div>
+              <h2 style="font-size: 1.3rem; font-weight: 800; color: #064e3b; margin: 0 0 3px 0;">
+                Xuất Sắc Hoàn Tất Khóa: <%= course.title %>
+              </h2>
+              <div style="font-size: 0.88rem; color: #065f46;">
+                Bạn đã hoàn thành toàn bộ <strong><%= allLessons.length %>/<%= allLessons.length %> bài học</strong> của chương trình đào tạo này!
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="/student/dashboard" class="btn btn-outline" style="background: #ffffff; border-color: #6ee7b7; color: #065f46; font-weight: 600; padding: 9px 16px;">
+              Về Bảng Học Tập
+            </a>
+            <a href="/courses" class="btn btn-primary" style="background: #059669; border-color: #047857; font-weight: 600; padding: 9px 18px;">
+              Khám Phá Khóa Mới &rarr;
+            </a>
+          </div>
+        </div>
+      <% } else if (typeof completedSuccess !== 'undefined' && completedSuccess) { %>
+        <div class="alert-banner alert-success" style="margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
+          <svg style="width: 18px; height: 18px; stroke: currentColor; stroke-width: 2.5; fill: none; flex-shrink: 0;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <div><%= completedSuccess %></div>
+        </div>
+      <% } %>
+
+      <!-- LAYOUT 2 CỘT: BÀI GIẢNG & LỘ TRÌNH -->
+      <div class="two-col-layout">
+        
+        <!-- CỘT TRÁI: NỘI DUNG BÀI GIẢNG -->
+        <article class="lesson-content-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #f1f5f9;">
+            <h2 class="panel-title" style="margin-bottom: 0;">Nội Dung Bài Học</h2>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Khóa: <%= course.title %></span>
+          </div>
+
+          <div class="lesson-content-body">
+            <%= lesson.content %>
+          </div>
+
+          <!-- TÀI LIỆU ĐÍNH KÈM BÀI HỌC (NẾU CÓ) -->
+          <% if (lesson.attachment_path) { %>
+            <div class="lesson-attachment-box" style="margin-top: 28px; padding: 18px 22px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 44px; height: 44px; border-radius: 10px; background: #eff6ff; color: var(--brand-blue); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; border: 1px solid #bfdbfe;">
+                  <% if (['pdf'].includes(lesson.attachment_type)) { %>
+                    📕
+                  <% } else if (['doc', 'docx'].includes(lesson.attachment_type)) { %>
+                    📘
+                  <% } else if (['xls', 'xlsx'].includes(lesson.attachment_type)) { %>
+                    📊
+                  <% } else if (['ppt', 'pptx'].includes(lesson.attachment_type)) { %>
+                    📙
+                  <% } else if (['zip', 'rar', '7z'].includes(lesson.attachment_type)) { %>
+                    📦
+                  <% } else if (['cpp', 'c', 'py', 'java', 'js', 'html', 'css', 'sql'].includes(lesson.attachment_type)) { %>
+                    💻
+                  <% } else { %>
+                    📄
+                  <% } %>
+                </div>
+                <div>
+                  <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Tài liệu đính kèm bài giảng</div>
+                  <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-title); margin-top: 1px;"><%= lesson.attachment_name || 'Tệp tài liệu đính kèm' %></div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 3px;">
+                    Định dạng: <strong><%= (lesson.attachment_type || 'Tệp').toUpperCase() %></strong>
+                    <% if (lesson.attachment_size) { %>
+                      &bull; Dung lượng: <%= lesson.attachment_size > 1048576 ? (lesson.attachment_size / 1048576).toFixed(1) + ' MB' : Math.round(lesson.attachment_size / 1024) + ' KB' %>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+              <a href="<%= lesson.attachment_path %>" target="_blank" download="<%= lesson.attachment_name %>" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px;">
+                <svg style="width: 16px; height: 16px; stroke: currentColor; stroke-width: 2.2; fill: none;" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>Tải Tài Liệu Về Máy</span>
+              </a>
+            </div>
+          <% } %>
+
+          <!-- THANH ĐIỀU HƯỚNG BÀI HỌC (TRƯỚC / HOÀN THÀNH / TIẾP THEO) -->
+          <footer class="lesson-nav-footer">
+            <div>
+              <% if (prevLesson) { %>
+                <a href="/student/course/<%= course.id %>/lesson/<%= prevLesson.id %>" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 6px;">
+                  &larr; <span>Bài trước: Bài <%= prevLesson.lesson_order %></span>
+                </a>
+              <% } else { %>
+                <span class="btn btn-outline disabled" style="opacity: 0.5;">
+                  &larr; Bài trước
+                </span>
+              <% } %>
+            </div>
+
+            <div>
+              <% if (isCurrentDone) { %>
+                <div class="lesson-completed-stamp">
+                  <svg style="width:16px;height:16px;stroke:currentColor;stroke-width:2.5;fill:none" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Bạn đã hoàn thành bài học này</span>
+                </div>
+              <% } else { %>
+                <form action="/student/course/<%= course.id %>/lesson/<%= lesson.id %>/complete" method="POST" style="margin: 0;">
+                  <button type="submit" class="btn btn-success" style="padding: 10px 22px; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg style="width:16px;height:16px;stroke:currentColor;stroke-width:2.5;fill:none" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Đánh Dấu Hoàn Thành Bài</span>
+                  </button>
+                </form>
+              <% } %>
+            </div>
+
+            <div>
+              <% if (nextLesson) { %>
+                <a href="/student/course/<%= course.id %>/lesson/<%= nextLesson.id %>" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+                  <span>Bài tiếp: Bài <%= nextLesson.lesson_order %></span> &rarr;
+                </a>
+              <% } else if (courseProgress >= 100) { %>
+                <a href="/student/my-courses" class="btn btn-primary" style="background: #059669; border-color: #047857; display: inline-flex; align-items: center; gap: 6px;">
+                  <span>🎓 Khóa học hoàn tất</span> &rarr;
+                </a>
+              <% } else { %>
+                <a href="/courses/<%= course.id %>" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 6px;">
+                  <span>Về trang khóa học</span> &rarr;
+                </a>
+              <% } %>
+            </div>
+          </footer>
+        </article>
+
+        <!-- CỘT PHẢI: LỘ TRÌNH KHÓA HỌC (STICKY) -->
+        <aside class="curriculum-sidebar-card">
+          <div class="curriculum-sidebar-header">
+            <h2>Lộ Trình Khóa Học</h2>
+            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px;">
+              <span style="color: var(--text-muted);">Tiến độ môn:</span>
+              <span class="<%= courseProgress >= 100 ? 'text-emerald' : 'text-blue' %>">
+                <%= completedCount %> / <%= allLessons.length %> bài (<%= courseProgress %>%)
+              </span>
+            </div>
+            <div class="progress-track" style="height: 6px;">
+              <div class="progress-fill <%= courseProgress >= 100 ? 'completed' : '' %>" <%- `style="width: ${courseProgress}%;"` %>></div>
+            </div>
+            <% if (courseProgress >= 100) { %>
+              <div style="margin-top: 10px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 6px 10px; font-size: 0.78rem; color: #047857; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                <span>🎓 Bạn đã hoàn thành 100% khóa học!</span>
+              </div>
+            <% } %>
+          </div>
+
+          <div class="curriculum-list">
+            <% allLessons.forEach((l, idx) => { %>
+              <a href="/student/course/<%= course.id %>/lesson/<%= l.id %>" 
+                 class="curriculum-item <%= l.id === lesson.id ? 'active' : '' %>">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-weight: 700; font-size: 0.82rem;" class="<%= l.id === lesson.id ? 'text-blue' : 'text-muted' %>">
+                    #<%= l.lesson_order %>
+                  </span>
+                  <span style="line-height: 1.35;"><%= l.title %></span>
+                </div>
+
+                <% if (l.is_done > 0) { %>
+                  <span class="lesson-done-badge" title="Đã học xong">
+                    ✓
+                  </span>
+                <% } else if (l.id === lesson.id) { %>
+                  <span style="font-size: 0.72rem; color: var(--brand-blue); font-weight: 700;">Đang xem</span>
+                <% } else { %>
+                  <span class="lesson-pending-badge">○</span>
+                <% } %>
+              </a>
+            <% }); %>
+          </div>
+        </aside>
+
+      </div>
+
+    </main>
+
+  </div>
+
+</body>
+</html>

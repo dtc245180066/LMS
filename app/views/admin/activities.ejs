@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>LMS</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/admin/activities.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+    
+    <!-- SIDEBAR QUẢN TRỊ VIÊN -->
+    <%- include('../partials/admin-sidebar', { active: 'activities' }) %>
+
+    <!-- VÙNG NỘI DUNG CHÍNH -->
+    <main class="admin-main">
+      
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-title">
+          <h1>Nhật Ký Hoạt Động Hệ Thống (Audit Trail)</h1>
+          <p>Giám sát thời gian thực các yêu cầu API Route và thao tác người dùng</p>
+        </div>
+      </header>
+
+      <!-- BẢNG NHẬT KÝ HOẠT ĐỘNG TOÀN DIỆN -->
+      <section class="panel-card">
+        <h2 class="panel-title">Lịch Sử Yêu Cầu & Thao Tác Hệ Thống</h2>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 170px;">Thời Gian</th>
+                <th style="width: 220px;">Người Thực Hiện</th>
+                <th style="width: 130px;">Phân Quyền</th>
+                <th>API Route / Endpoint</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (activities && activities.length > 0) { %>
+                <% activities.forEach(act => { %>
+                  <tr>
+                    <td class="activity-time"><%= new Date(act.created_at).toLocaleString('vi-VN') %></td>
+                    <td>
+                      <% if (act.username) { %>
+                        <strong><%= act.full_name %></strong> <span style="color: var(--text-muted); font-size: 0.82rem;">(@<%= act.username %>)</span>
+                      <% } else { %>
+                        <span style="color: var(--text-muted); font-style: italic;">Khách vãng lai</span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <% if (act.role === 'admin') { %>
+                        <span class="pill-badge pill-admin">Admin</span>
+                      <% } else if (act.role === 'instructor') { %>
+                        <span class="pill-badge pill-instructor">Giảng viên</span>
+                      <% } else if (act.role === 'student') { %>
+                        <span class="pill-badge pill-student">Sinh viên</span>
+                      <% } else { %>
+                        <span style="color: var(--text-light); font-size: 0.8rem;">---</span>
+                      <% } %>
+                    </td>
+                    <td class="activity-desc"><code class="id-pill" style="font-weight: 600; font-size: 0.84rem;"><%= act.action %></code></td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <tr>
+                  <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 28px;">
+                    Chưa có nhật ký hoạt động nào được ghi nhận.
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PHÂN TRANG -->
+        <%- include('../partials/pagination', { pagination }) %>
+      </section>
+
+    </main>
+
+  </div>
+
+</body>
+</html>
+

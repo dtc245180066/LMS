@@ -1,0 +1,60 @@
+<!-- views/partials/instructor-sidebar.ejs -->
+<aside class="admin-sidebar">
+  <div>
+    <div class="sidebar-brand">
+      <div class="brand-emblem">LMS</div>
+      <div class="brand-details">
+        <div class="brand-title">LMS Giảng Viên</div>
+        <div class="brand-subtitle">Cổng Đào Tạo ICTU</div>
+      </div>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li>
+        <a href="/instructor/dashboard" class="<%= typeof active !== 'undefined' && active === 'dashboard' ? 'active' : '' %>">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <span>Bảng Giảng Dạy</span>
+        </a>
+      </li>
+      <li>
+        <a href="/instructor/courses" class="<%= typeof active !== 'undefined' && active === 'courses' ? 'active' : '' %>">
+          <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <span>Khóa Học Của Tôi</span>
+        </a>
+      </li>
+      <li>
+        <a href="/instructor/students" class="<%= typeof active !== 'undefined' && active === 'students' ? 'active' : '' %>">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <span>Tiến Độ Học Viên</span>
+        </a>
+      </li>
+      <li>
+        <a href="/instructor/enrollments" class="<%= typeof active !== 'undefined' && active === 'enrollments' ? 'active' : '' %>">
+          <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline></svg>
+          <span>Duyệt Đăng Ký</span>
+          <% if (typeof pendingEnrollmentsCount !== 'undefined' && pendingEnrollmentsCount > 0) { %>
+            <span class="pill-badge pill-draft" style="margin-left: auto; font-size: 0.72rem; padding: 2px 7px; background: #f59e0b; color: #ffffff;">
+              <%= pendingEnrollmentsCount %>
+            </span>
+          <% } %>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="sidebar-footer">
+    <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+      <div class="sidebar-user">
+        <div class="user-avatar"><%= currentUser.full_name ? currentUser.full_name.charAt(0).toUpperCase() : 'G' %></div>
+        <div class="user-info">
+          <div class="user-name"><%= currentUser.full_name %></div>
+          <div class="user-role-label">Giảng viên</div>
+        </div>
+      </div>
+      <a href="/auth/logout" class="btn-sidebar-logout" title="Đăng xuất khỏi hệ thống">
+        <svg style="width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        <span>Đăng xuất</span>
+      </a>
+    <% } %>
+  </div>
+</aside>

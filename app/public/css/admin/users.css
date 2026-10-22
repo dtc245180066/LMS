@@ -1,0 +1,80 @@
+/* ==========================================================================
+   ADMIN USERS MANAGEMENT STYLESHEET (/admin/users)
+   Exclusively for User Provisioning, Role Assignment & Account Locking
+   ========================================================================== */
+
+/* === FORM CẤP TÀI KHOẢN MỚI (PROVISION USER) === */
+.form-provision-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1.2fr 1.2fr 1.2fr auto;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+@media (max-width: 1024px) {
+  .form-provision-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .form-provision-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* === BADGE TRẠNG THÁI TÀI KHOẢN === */
+.pill-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.pill-active {
+  background: var(--emerald-light);
+  color: var(--emerald-green);
+  border: 1px solid var(--emerald-border);
+}
+
+.pill-locked {
+  background: var(--crimson-light);
+  color: var(--crimson-red);
+  border: 1px solid var(--crimson-border);
+}
+
+/* Nút Khóa / Mở khóa nhỏ gọn */
+.btn-lock-toggle {
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.2;
+}
+
+.btn-lock {
+  background: #fff;
+  color: var(--crimson-red);
+  border: 1px solid var(--crimson-border);
+}
+
+.btn-lock:hover {
+  background: var(--crimson-light);
+  border-color: var(--crimson-red);
+}
+
+.btn-unlock {
+  background: #fff;
+  color: var(--emerald-green);
+  border: 1px solid var(--emerald-border);
+}
+
+.btn-unlock:hover {
+  background: var(--emerald-light);
+  border-color: var(--emerald-green);
+}

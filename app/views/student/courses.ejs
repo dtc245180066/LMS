@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>LMS</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/student/courses.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+    
+    <!-- SIDEBAR SINH VIÊN (TAB KHÁM PHÁ KHÓA HỌC) -->
+    <%- include('../partials/student-sidebar', { active: 'courses' }) %>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main">
+      <header class="top-header">
+        <div class="header-title">
+          <h1>Danh Mục Khóa Học</h1>
+          <p>Các chương trình đào tạo công nghệ thông tin và phát triển phần mềm</p>
+        </div>
+      </header>
+
+      <!-- FLASH MESSAGE THÔNG BÁO -->
+      <% if (typeof message !== 'undefined' && message) { %>
+        <div class="alert-banner alert-<%= messageType || 'success' %>" style="margin-bottom: 24px; display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 10px;">
+          <% if (messageType === 'success') { %>
+            <svg style="width: 22px; height: 22px; stroke: #059669; stroke-width: 2.5; fill: none; flex-shrink: 0;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <div style="font-weight: 500; font-size: 0.94rem;">
+              <strong style="color: #065f46;">Ghi danh thành công!</strong> <%= message.replace('Ghi danh khóa học thành công! ', '') %>
+            </div>
+          <% } else { %>
+            <svg style="width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; fill: none; flex-shrink: 0;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <div><%= message %></div>
+          <% } %>
+        </div>
+      <% } %>
+
+      <!-- THANH TÌM KIẾM KHÓA HỌC -->
+      <form action="/courses" method="GET" class="filter-search-bar" style="margin-bottom: 28px;">
+        <div class="search-input-wrap">
+          <svg style="width: 16px; height: 16px; stroke: #94a3b8; stroke-width: 2; fill: none;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" name="search" class="search-input" placeholder="Tìm theo tên môn học, mô tả hoặc tên giảng viên..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Tìm kiếm</button>
+        <% if (typeof search !== 'undefined' && search) { %>
+          <a href="/courses" class="btn btn-outline btn-sm">Bỏ lọc</a>
+        <% } %>
+      </form>
+
+      <div class="courses-grid">
+        <% if (courses && courses.length > 0) { %>
+          <% courses.forEach(course => { %>
+            <div class="course-card">
+              <div>
+                <div class="course-meta-top">
+                  <span class="course-tag">Khóa học</span>
+                  <span class="lesson-count-tag"><%= course.total_lessons %> bài học</span>
+                </div>
+                <h3><a href="/courses/<%= course.id %>" style="color: inherit; text-decoration: none;"><%= course.title %></a></h3>
+                <div class="course-instructor-info">
+                  <div class="instructor-icon-circle"><%= course.instructor_name ? course.instructor_name.charAt(0).toUpperCase() : 'G' %></div>
+                  <span>Giảng viên: <strong><%= course.instructor_name %></strong></span>
+                </div>
+                <p class="course-desc"><%= course.description %></p>
+              </div>
+
+              <div class="course-footer">
+                <div class="course-footer-actions">
+                  <% if (course.enrollment_status === 'approved') { %>
+                    <a href="/courses/<%= course.id %>" class="btn btn-outline btn-block" style="border-color: #a7f3d0; color: #059669; background: #ecfdf5;">
+                      ✓ Đang học &bull; Xem giáo trình
+                    </a>
+                  <% } else if (course.enrollment_status === 'pending') { %>
+                    <a href="/student/my-courses?status=pending" class="btn btn-outline btn-block" style="border-color: #fde68a; color: #b45309; background: #fffbeb;">
+                      ⏳ Đang chờ Giảng viên duyệt
+                    </a>
+                  <% } else if (course.enrollment_status === 'rejected') { %>
+                    <div style="margin-bottom: 6px; text-align: center;">
+                      <span class="pill-badge" style="background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; font-size: 0.78rem; padding: 3px 8px; font-weight: 600;">
+                        ✕ Yêu cầu bị từ chối
+                      </span>
+                    </div>
+                    <form action="/student/enroll/<%= course.id %>" method="POST" style="margin: 0;">
+                      <button type="submit" class="btn btn-outline btn-block" style="border-color: #fca5a5; color: #dc2626; font-size: 0.84rem; padding: 8px 12px;">
+                        Gửi lại yêu cầu ghi danh
+                      </button>
+                    </form>
+                  <% } else { %>
+                    <form action="/student/enroll/<%= course.id %>" method="POST" style="margin: 0;">
+                      <button type="submit" class="btn btn-primary btn-block">
+                        Ghi Danh Khóa Học
+                      </button>
+                    </form>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <div class="panel-card" style="text-align: center; padding: 48px 24px; color: var(--text-muted); grid-column: 1 / -1;">
+            <svg style="width: 48px; height: 48px; stroke: #94a3b8; stroke-width: 1.5; fill: none; margin-bottom: 14px;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <% if (typeof search !== 'undefined' && search) { %>
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-title); margin-bottom: 6px;">Không tìm thấy khóa học nào phù hợp</h3>
+              <p style="font-size: 0.9rem; margin-bottom: 18px;">Không có kết quả nào khớp với từ khóa "<strong><%= search %></strong>". Vui lòng thử từ khóa khác.</p>
+              <a href="/courses" class="btn btn-primary btn-sm">Xem tất cả khóa học</a>
+            <% } else { %>
+              <p style="font-size: 1rem; color: var(--text-title); margin: 0;">Hiện chưa có khóa học nào được đăng tải trên hệ thống.</p>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- PHÂN TRANG -->
+      <%- include('../partials/pagination', { pagination }) %>
+    </main>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>LMS</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/admin/courses.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+    
+    <!-- SIDEBAR QUẢN TRỊ VIÊN -->
+    <%- include('../partials/admin-sidebar', { active: 'courses' }) %>
+
+    <!-- VÙNG NỘI DUNG CHÍNH -->
+    <main class="admin-main">
+      
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-title">
+          <h1>Danh Mục Khóa Học Toàn Trường</h1>
+          <p>Giám sát toàn bộ các chương trình đào tạo, bài giảng và sĩ số sinh viên</p>
+        </div>
+      </header>
+
+      <!-- BẢNG DANH SÁCH KHÓA HỌC -->
+      <section class="panel-card">
+        <h2 class="panel-title">Tất Cả Khóa Học Đang Mở</h2>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;">Mã số</th>
+                <th>Tên Khóa Học</th>
+                <th>Giảng Viên Phụ Trách</th>
+                <th>Số Bài Giảng</th>
+                <th>Sĩ Số Học Viên</th>
+                <th>Ngày Khởi Tạo</th>
+                <th style="text-align: right;">Xem Chi Tiết</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (courses && courses.length > 0) { %>
+                <% courses.forEach(c => { %>
+                  <tr>
+                    <td><code class="id-pill">#<%= c.id %></code></td>
+                    <td style="font-weight: 600;">
+                      <a href="/admin/courses/<%= c.id %>" style="color: var(--brand-blue); text-decoration: none;"><%= c.title %></a>
+                    </td>
+                    <td><%= c.instructor_name %></td>
+                    <td>
+                      <span class="pill-badge" style="background: #f1f5f9; color: #475569;"><%= c.total_lessons %> bài</span>
+                    </td>
+                    <td>
+                      <span class="pill-badge pill-student"><%= c.student_count %> học viên</span>
+                    </td>
+                    <td style="color: var(--text-muted); font-size: 0.85rem;"><%= new Date(c.created_at).toLocaleDateString('vi-VN') %></td>
+                    <td style="text-align: right;">
+                      <a href="/admin/courses/<%= c.id %>" class="btn btn-outline btn-sm">Xem giáo trình</a>
+                    </td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <tr>
+                  <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 28px;">
+                    Hiện chưa có khóa học nào được đăng tải trên hệ thống.
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PHÂN TRANG -->
+        <%- include('../partials/pagination', { pagination }) %>
+      </section>
+
+    </main>
+
+  </div>
+
+</body>
+</html>
+

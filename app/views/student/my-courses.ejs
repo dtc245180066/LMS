@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>LMS</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/student/my-courses.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+    
+    <!-- SIDEBAR SINH VIÊN (3 TAB CHUẨN) -->
+    <%- include('../partials/student-sidebar', { active: 'my-courses' }) %>
+
+    <!-- VÙNG NỘI DUNG CHÍNH -->
+    <main class="admin-main">
+      
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-title">
+          <h1>Khóa Học Của Tôi</h1>
+          <p>Quản lý các chương trình đào tạo bạn đã ghi danh và theo dõi tiến độ xét duyệt</p>
+        </div>
+      </header>
+
+      <!-- FLASH MESSAGE -->
+      <% if (typeof message !== 'undefined' && message) { %>
+        <div class="alert-banner alert-<%= messageType || 'success' %>" style="margin-bottom: 24px; display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 10px;">
+          <% if (messageType === 'success') { %>
+            <svg style="width: 22px; height: 22px; stroke: #059669; stroke-width: 2.5; fill: none; flex-shrink: 0;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <div style="font-weight: 500; font-size: 0.94rem;">
+              <strong style="color: #065f46;">Ghi danh thành công!</strong> <%= message.replace('Ghi danh khóa học thành công! ', '') %>
+            </div>
+          <% } else { %>
+            <svg style="width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; fill: none; flex-shrink: 0;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <div><%= message %></div>
+          <% } %>
+        </div>
+      <% } %>
+
+      <!-- THANH TÌM KIẾM VÀ LỌC TRẠNG THÁI -->
+      <form action="/student/my-courses" method="GET" class="filter-search-bar" style="margin-bottom: 28px;">
+        <div class="search-input-wrap">
+          <svg style="width: 16px; height: 16px; stroke: #94a3b8; stroke-width: 2; fill: none;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" name="search" class="search-input" placeholder="Tìm theo tên môn học hoặc mô tả..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+        </div>
+
+        <select name="status" class="filter-select">
+          <option value="">-- Tất cả trạng thái (<%= enrolledList.length %>) --</option>
+          <option value="approved" <%= typeof statusFilter !== 'undefined' && statusFilter === 'approved' ? 'selected' : '' %>>Đang học (Đã duyệt - <%= approvedCourses.length %>)</option>
+          <option value="pending" <%= typeof statusFilter !== 'undefined' && statusFilter === 'pending' ? 'selected' : '' %>>Đang chờ duyệt (<%= pendingCourses.length %>)</option>
+          <option value="rejected" <%= typeof statusFilter !== 'undefined' && statusFilter === 'rejected' ? 'selected' : '' %>>Bị từ chối (<%= rejectedCourses.length %>)</option>
+        </select>
+
+        <button type="submit" class="btn btn-primary btn-sm">Tìm kiếm</button>
+        <% if ((typeof search !== 'undefined' && search) || (typeof statusFilter !== 'undefined' && statusFilter)) { %>
+          <a href="/student/my-courses" class="btn btn-outline btn-sm">Đặt lại</a>
+        <% } %>
+      </form>
+
+      <!-- 1. KHỐI KHÓA HỌC ĐANG HỌC (APPROVED) -->
+      <% if (!statusFilter || statusFilter === 'approved') { %>
+        <section style="margin-bottom: 40px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2 class="panel-title" style="margin-bottom: 0;">Khóa Học Đang Theo Học (<%= approvedCourses.length %>)</h2>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Đã được Giảng viên phê duyệt vào lớp</span>
+          </div>
+
+          <% if (approvedCourses && approvedCourses.length > 0) { %>
+            <div class="courses-grid">
+              <% approvedCourses.forEach(course => { %>
+                <article class="course-card">
+                  <div>
+                    <div class="course-meta-top">
+                      <% if (course.allCompleted || (course.total_lessons > 0 && course.progress >= 100)) { %>
+                        <span class="course-tag completed" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 700;">🎓 Đã hoàn thành 100%</span>
+                      <% } else { %>
+                        <span class="course-tag enrolled">Đang học</span>
+                      <% } %>
+                      <span class="lesson-count-tag"><%= course.total_lessons %> bài học</span>
+                    </div>
+
+                    <h3>
+                      <a href="/courses/<%= course.id %>"><%= course.title %></a>
+                    </h3>
+
+                    <div class="course-instructor-info">
+                      <div class="instructor-icon-circle"><%= course.instructor_name ? course.instructor_name.charAt(0).toUpperCase() : 'G' %></div>
+                      <span>Giảng viên: <strong><%= course.instructor_name %></strong></span>
+                    </div>
+
+                    <p class="course-desc"><%= course.description || 'Chưa có mô tả chi tiết cho môn học này.' %></p>
+                  </div>
+
+                  <div class="course-footer">
+                    <div class="progress-container">
+                      <div class="progress-info">
+                        <span>Tiến độ hoàn thành</span>
+                        <strong class="<%= course.progress >= 100 ? 'text-emerald' : 'text-blue' %>">
+                          <%= course.completed_lessons %> / <%= course.total_lessons %> bài (<%= course.progress %>%)
+                        </strong>
+                      </div>
+                      <div class="progress-track">
+                        <div class="progress-fill <%= course.progress >= 100 ? 'completed' : '' %>" <%- `style="width: ${course.progress}%;"` %>></div>
+                      </div>
+                    </div>
+
+                    <div class="course-footer-actions">
+                      <% if (course.nextLesson && !course.allCompleted) { %>
+                        <a href="/student/course/<%= course.id %>/lesson/<%= course.nextLesson.id %>" class="btn btn-primary btn-block">
+                          Học tiếp: Bài <%= course.nextLesson.lesson_order %> &rarr;
+                        </a>
+                      <% } else { %>
+                        <a href="/courses/<%= course.id %>" class="btn btn-outline btn-block">
+                          Ôn tập lại giáo trình &rarr;
+                        </a>
+                      <% } %>
+                    </div>
+                  </div>
+                </article>
+              <% }); %>
+            </div>
+          <% } else if (statusFilter === 'approved') { %>
+            <div class="panel-card" style="text-align: center; padding: 40px 24px; color: var(--text-muted);">
+              Không tìm thấy khóa học nào phù hợp với bộ lọc hiện tại.
+            </div>
+          <% } %>
+        </section>
+      <% } %>
+
+      <!-- 2. KHỐI YÊU CẦU ĐANG CHỜ DUYỆT (PENDING) -->
+      <% if (!statusFilter || statusFilter === 'pending') { %>
+        <% if (pendingCourses && pendingCourses.length > 0) { %>
+          <section style="margin-bottom: 40px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h2 class="panel-title" style="margin-bottom: 0; color: #b45309;">
+                Yêu Cầu Ghi Danh Đang Chờ Giảng Viên Duyệt (<%= pendingCourses.length %>)
+              </h2>
+              <span style="font-size: 0.85rem; color: #b45309;">Đang chờ Thầy/Cô xét duyệt sĩ số</span>
+            </div>
+
+            <div class="courses-grid">
+              <% pendingCourses.forEach(course => { %>
+                <article class="course-card" style="border-color: #fde68a; background: #fffdf5;">
+                  <div>
+                    <div class="course-meta-top">
+                      <span class="pill-badge" style="background: #fef3c7; color: #d97706; border: 1px solid #fde68a; font-weight: 700;">
+                        ⏳ Đang chờ phê duyệt
+                      </span>
+                      <span class="lesson-count-tag"><%= course.total_lessons %> bài học</span>
+                    </div>
+
+                    <h3>
+                      <a href="/courses/<%= course.id %>"><%= course.title %></a>
+                    </h3>
+
+                    <div class="course-instructor-info">
+                      <div class="instructor-icon-circle" style="background: #fef3c7; color: #d97706;">
+                        <%= course.instructor_name ? course.instructor_name.charAt(0).toUpperCase() : 'G' %>
+                      </div>
+                      <span>Giảng viên: <strong><%= course.instructor_name %></strong></span>
+                    </div>
+
+                    <p class="course-desc"><%= course.description || 'Chưa có mô tả chi tiết cho môn học này.' %></p>
+                    
+                    <div style="background: #fef9c3; border-radius: 8px; padding: 10px 12px; font-size: 0.82rem; color: #854d0e; margin-bottom: 14px;">
+                      Gửi yêu cầu lúc: <strong><%= new Date(course.enrolled_at).toLocaleString('vi-VN') %></strong>. Quyền vào học sẽ tự động kích hoạt ngay khi Thầy/Cô duyệt đơn.
+                    </div>
+                  </div>
+
+                  <div class="course-footer" style="border-top-color: #fef3c7;">
+                    <div class="course-footer-actions">
+                      <button class="btn btn-outline btn-block disabled" style="opacity: 0.6; cursor: not-allowed; background: #fefce8; border-color: #fef08a;">
+                        🔒 Chưa thể vào học (Chờ duyệt)
+                      </button>
+
+                      <form action="/student/enroll/<%= course.id %>/cancel" method="POST" style="margin: 0;" onsubmit="return confirm('Bạn có chắc chắn muốn hủy yêu cầu ghi danh khóa học này không?');">
+                        <button type="submit" class="btn btn-outline btn-block" style="border-color: #fca5a5; color: #dc2626; font-size: 0.85rem; padding: 7px 12px; margin-top: 8px;">
+                          Rút lại / Hủy yêu cầu ghi danh
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </article>
+              <% }); %>
+            </div>
+          </section>
+        <% } %>
+      <% } %>
+
+      <!-- 3. KHỐI YÊU CẦU BỊ TỪ CHỐI (REJECTED) -->
+      <% if (rejectedCourses && rejectedCourses.length > 0) { %>
+        <section style="margin-bottom: 40px;">
+          <h2 class="panel-title" style="margin-bottom: 16px; color: #dc2626;">
+            Yêu Cầu Không Được Phê Duyệt (<%= rejectedCourses.length %>)
+          </h2>
+
+          <div class="courses-grid">
+            <% rejectedCourses.forEach(course => { %>
+              <article class="course-card" style="border-color: #fecaca; background: #fff5f5;">
+                <div>
+                  <div class="course-meta-top">
+                    <span class="pill-badge" style="background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; font-weight: 700;">
+                      ✕ Bị từ chối
+                    </span>
+                    <span class="lesson-count-tag"><%= course.total_lessons %> bài học</span>
+                  </div>
+
+                  <h3><%= course.title %></h3>
+                  <div class="course-instructor-info">
+                    <span>Giảng viên: <strong><%= course.instructor_name %></strong></span>
+                  </div>
+                  <p class="course-desc"><%= course.description %></p>
+                </div>
+
+                <div class="course-footer" style="border-top-color: #fee2e2;">
+                  <div class="course-footer-actions">
+                    <form action="/student/enroll/<%= course.id %>" method="POST" style="margin: 0;">
+                      <button type="submit" class="btn btn-primary btn-block">
+                        Gửi Lại Yêu Cầu Ghi Danh
+                      </button>
+                    </form>
+                    <form action="/student/enroll/<%= course.id %>/cancel" method="POST" style="margin: 0; margin-top: 8px;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa thông báo từ chối này không?');">
+                      <button type="submit" class="btn btn-outline btn-block" style="border-color: #fca5a5; color: #dc2626; font-size: 0.85rem; padding: 7px 12px;">
+                        Xóa thông báo từ chối này
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </article>
+            <% }); %>
+          </div>
+        </section>
+      <% } %>
+
+      <!-- EMPTY STATE KHI CHƯA GHI DANH GÌ CẢ -->
+      <% if (enrolledList.length === 0) { %>
+        <div class="panel-card" style="text-align: center; padding: 48px 24px;">
+          <svg style="width: 48px; height: 48px; stroke: #94a3b8; stroke-width: 1.5; fill: none; margin-bottom: 12px;" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <h3 style="font-size: 1.15rem; color: var(--text-title); margin-bottom: 6px;">
+            <%= search || statusFilter ? 'Không tìm thấy khóa học nào phù hợp' : 'Bạn chưa đăng ký khóa học nào' %>
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
+            <%= search || statusFilter ? 'Hãy thử tìm kiếm với từ khóa khác hoặc đặt lại bộ lọc.' : 'Hãy khám phá danh mục khóa học và gửi yêu cầu ghi danh để bắt đầu học tập.' %>
+          </p>
+          <a href="/courses" class="btn btn-primary">+ Khám Phá Khóa Học Ngay</a>
+        </div>
+      <% } %>
+
+    </main>
+
+  </div>
+
+</body>
+</html>
+

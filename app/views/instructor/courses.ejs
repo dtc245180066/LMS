@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>LMS</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/instructor/courses.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+    
+    <!-- SIDEBAR GIẢNG VIÊN (3 TAB CHUẨN) -->
+    <%- include('../partials/instructor-sidebar', { active: 'courses' }) %>
+
+    <!-- VÙNG NỘI DUNG CHÍNH -->
+    <main class="admin-main">
+      
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-title">
+          <h1>Khóa Học Của Tôi</h1>
+          <p>Quản lý danh sách môn học, biên soạn giáo trình và theo dõi tiến độ sinh viên</p>
+        </div>
+        <div class="header-actions">
+          <a href="/instructor/courses/create" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg style="width:16px;height:16px;stroke:currentColor;stroke-width:2.5;fill:none" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Tạo Khóa Học Mới</span>
+          </a>
+        </div>
+      </header>
+
+      <% if (typeof message !== 'undefined' && message) { %>
+        <div class="alert-banner alert-<%= messageType || 'success' %>">
+          <%= message %>
+        </div>
+      <% } %>
+
+      <!-- THANH TÌM KIẾM VÀ LỌC TRẠNG THÁI KHÓA HỌC -->
+      <form action="/instructor/courses" method="GET" class="filter-search-bar">
+        <div class="search-input-wrap">
+          <svg style="width: 16px; height: 16px; stroke: #94a3b8; stroke-width: 2; fill: none;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" name="search" class="search-input" placeholder="Tìm kiếm theo tên khóa học hoặc nội dung..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+        </div>
+
+        <select name="status" class="filter-select">
+          <option value="">-- Tất cả trạng thái --</option>
+          <option value="published" <%= typeof status !== 'undefined' && status === 'published' ? 'selected' : '' %>>Đang xuất bản (Công khai)</option>
+          <option value="draft" <%= typeof status !== 'undefined' && status === 'draft' ? 'selected' : '' %>>Bản nháp (Đang ẩn)</option>
+        </select>
+
+        <button type="submit" class="btn btn-primary btn-sm">Tìm kiếm</button>
+        <% if ((typeof search !== 'undefined' && search) || (typeof status !== 'undefined' && status)) { %>
+          <a href="/instructor/courses" class="btn btn-outline btn-sm">Đặt lại</a>
+        <% } %>
+      </form>
+
+      <!-- DANH SÁCH THẺ KHÓA HỌC TRỰC QUAN -->
+      <section>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 class="panel-title" style="margin-bottom: 0;">Khóa Học Đang Giảng Dạy (<%= myCourses.length %>)</h2>
+        </div>
+
+        <% if (myCourses && myCourses.length > 0) { %>
+          <div class="courses-deck">
+            <% myCourses.forEach(c => { %>
+              <article class="course-deck-card">
+                
+                <!-- HEADER THẺ -->
+                <div class="deck-card-header">
+                  <div class="deck-badges">
+                    <code class="id-pill">Khóa #<%= c.id %></code>
+                    <% if (c.status === 'draft') { %>
+                      <span class="pill-badge pill-draft">Bản nháp (Đang ẩn)</span>
+                    <% } else { %>
+                      <span class="pill-badge pill-success">Đang xuất bản (Công khai)</span>
+                    <% } %>
+                  </div>
+                  
+                  <div class="deck-quick-toggle">
+                    <form action="/instructor/courses/<%= c.id %>/toggle-status" method="POST" style="margin: 0;">
+                      <% if (c.status === 'published') { %>
+                        <button type="submit" class="btn-lock-toggle btn-lock" title="Chuyển về trạng thái bản nháp để chỉnh sửa">
+                          Chuyển về nháp
+                        </button>
+                      <% } else { %>
+                        <button type="submit" class="btn-lock-toggle btn-unlock" title="Công khai khóa học cho sinh viên thấy">
+                          Công khai khóa học
+                        </button>
+                      <% } %>
+                    </form>
+                  </div>
+                </div>
+
+                <!-- NỘI DUNG THẺ -->
+                <div class="deck-card-body">
+                  <h3 class="deck-card-title">
+                    <a href="/instructor/courses/<%= c.id %>/lessons"><%= c.title %></a>
+                  </h3>
+                  <p class="deck-card-desc"><%= c.description || 'Chưa có mô tả chi tiết cho môn học này.' %></p>
+                  
+                  <div class="deck-stats-row">
+                    <div class="deck-stat-item">
+                      <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                      <span><strong><%= c.total_lessons %></strong> bài giảng</span>
+                    </div>
+                    <div class="deck-stat-item">
+                      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                      <span><strong><%= c.total_students %></strong> học viên ghi danh</span>
+                    </div>
+                    <div class="deck-stat-item">
+                      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                      <span>Ngày tạo: <%= new Date(c.created_at).toLocaleDateString('vi-VN') %></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- FOOTER HÀNH ĐỘNG -->
+                <div class="deck-card-footer">
+                  <a href="/instructor/courses/<%= c.id %>/lessons" class="btn btn-primary btn-sm">
+                    Quản lý bài giảng (<%= c.total_lessons %> bài) &rarr;
+                  </a>
+                </div>
+
+              </article>
+            <% }); %>
+          </div>
+
+          <!-- PHÂN TRANG -->
+          <%- include('../partials/pagination', { pagination }) %>
+        <% } else { %>
+          <div class="panel-card" style="text-align: center; padding: 48px 24px;">
+            <svg style="width: 48px; height: 48px; stroke: #94a3b8; stroke-width: 1.5; fill: none; margin-bottom: 12px;" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            <h3 style="font-size: 1.15rem; color: var(--text-title); margin-bottom: 6px;">
+              <%= (typeof search !== 'undefined' && search) || (typeof status !== 'undefined' && status) ? 'Không tìm thấy khóa học nào phù hợp' : 'Thầy/cô chưa khởi tạo khóa học nào' %>
+            </h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
+              <%= (typeof search !== 'undefined' && search) || (typeof status !== 'undefined' && status) ? 'Vui lòng thử lại với từ khóa khác hoặc bỏ lọc trạng thái.' : 'Hãy tạo khóa học đầu tiên để bắt đầu biên soạn giáo trình và tiếp nhận sinh viên học tập.' %>
+            </p>
+            <% if ((typeof search !== 'undefined' && search) || (typeof status !== 'undefined' && status)) { %>
+              <a href="/instructor/courses" class="btn btn-outline btn-sm">Bỏ lọc & Đặt lại</a>
+            <% } else { %>
+              <a href="/instructor/courses/create" class="btn btn-primary">+ Tạo Khóa Học Mới Ngay</a>
+            <% } %>
+          </div>
+        <% } %>
+      </section>
+
+    </main>
+
+  </div>
+
+</body>
+</html>

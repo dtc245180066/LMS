@@ -1,0 +1,26 @@
+/* ==========================================================================
+   ADMIN COURSES MANAGEMENT STYLESHEET (/admin/courses)
+   Exclusively for Global Course Catalog Inspection & Management
+   ========================================================================== */
+
+.course-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.course-status-published {
+  background: var(--emerald-light);
+  color: var(--emerald-green);
+  border: 1px solid var(--emerald-border);
+}
+
+.course-status-draft {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}

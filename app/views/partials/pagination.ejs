@@ -1,0 +1,69 @@
+<% if (typeof pagination !== 'undefined' && pagination && pagination.totalPages > 1) { %>
+  <div class="pagination-container">
+    <div class="pagination-info">
+      Hiển thị <strong><%= pagination.totalItems > 0 ? pagination.offset + 1 : 0 %></strong> - <strong><%= Math.min(pagination.offset + pagination.limit, pagination.totalItems) %></strong> trên tổng số <strong><%= pagination.totalItems %></strong> mục
+    </div>
+
+    <nav class="pagination-nav" aria-label="Điều hướng phân trang">
+      <!-- NÚT TRANG TRƯỚC -->
+      <% if (pagination.hasPrev) { %>
+        <a href="<%= buildPageUrl(pagination.prevPage) %>" class="page-link prev-link" title="Trang trước">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <span>Trước</span>
+        </a>
+      <% } else { %>
+        <span class="page-link disabled prev-link">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <span>Trước</span>
+        </span>
+      <% } %>
+
+      <!-- DANH SÁCH CÁC SỐ TRANG -->
+      <% 
+        const total = pagination.totalPages;
+        const current = pagination.page;
+        let pagesToShow = [];
+
+        if (total <= 7) {
+          for (let i = 1; i <= total; i++) pagesToShow.push(i);
+        } else {
+          pagesToShow.push(1);
+          if (current > 3) pagesToShow.push('...');
+          
+          const start = Math.max(2, current - 1);
+          const end = Math.min(total - 1, current + 1);
+          for (let i = start; i <= end; i++) {
+            pagesToShow.push(i);
+          }
+
+          if (current < total - 2) pagesToShow.push('...');
+          pagesToShow.push(total);
+        }
+      %>
+
+      <% pagesToShow.forEach(p => { %>
+        <% if (p === '...') { %>
+          <span class="page-dots">&hellip;</span>
+        <% } else if (p === current) { %>
+          <span class="page-link active" aria-current="page"><%= p %></span>
+        <% } else { %>
+          <a href="<%= buildPageUrl(p) %>" class="page-link"><%= p %></a>
+        <% } %>
+      <% }); %>
+
+      <!-- NÚT TRANG SAU -->
+      <% if (pagination.hasNext) { %>
+        <a href="<%= buildPageUrl(pagination.nextPage) %>" class="page-link next-link" title="Trang sau">
+          <span>Sau</span>
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+      <% } else { %>
+        <span class="page-link disabled next-link">
+          <span>Sau</span>
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </span>
+      <% } %>
+    </nav>
+  </div>
+<% } %>
+

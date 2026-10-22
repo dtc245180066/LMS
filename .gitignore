@@ -1,0 +1,22 @@
+# Thư viện ngoài quá nặng
+node_modules/
+
+# File bí mật (Tuyệt đối không commit)
+.env
+.env.local
+
+# Khóa bí mật SSL
+nginx/ssl/*.key
+
+# File log hệ thống
+*.log
+
+# File tài liệu upload
+app/public/uploads/*
+!app/public/uploads/.gitkeep
+!app/public/uploads/materials/.gitkeep
+
+#Skill
+learning
+.agents
+README_SKILL.md

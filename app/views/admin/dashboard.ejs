@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>LMS</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/admin/dashboard.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+    
+    <!-- SIDEBAR QUẢN TRỊ VIÊN -->
+    <%- include('../partials/admin-sidebar', { active: 'dashboard' }) %>
+
+    <!-- VÙNG NỘI DUNG CHÍNH -->
+    <main class="admin-main">
+      
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-title">
+          <h1>Tổng Quan Hệ Thống</h1>
+          <p>Báo cáo chỉ số vận hành và tình trạng tài nguyên toàn trường</p>
+        </div>
+      </header>
+
+      <!-- 1. BỘ CHỈ SỐ THỐNG KÊ CHUNG (5 METRICS) -->
+      <section class="metrics-grid">
+        <div class="metric-card card-blue">
+          <div class="metric-title">Tổng Tài Khoản</div>
+          <div class="metric-value"><%= metrics.total_users || 0 %></div>
+        </div>
+
+        <div class="metric-card card-green">
+          <div class="metric-title">Đang Hoạt Động</div>
+          <div class="metric-value"><%= metrics.active_users || 0 %></div>
+        </div>
+
+        <div class="metric-card card-red">
+          <div class="metric-title">Tài Khoản Bị Khóa</div>
+          <div class="metric-value"><%= metrics.locked_users || 0 %></div>
+        </div>
+
+        <div class="metric-card card-purple">
+          <div class="metric-title">Tổng Khóa Học</div>
+          <div class="metric-value"><%= metrics.course_count || 0 %></div>
+        </div>
+
+        <div class="metric-card card-amber">
+          <div class="metric-title">Lượt Ghi Danh</div>
+          <div class="metric-value"><%= metrics.enrollment_count || 0 %></div>
+        </div>
+      </section>
+
+      <!-- 2. TÓM TẮT NHẬT KÝ HOẠT ĐỘNG GẦN ĐÂY -->
+      <section class="panel-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 class="panel-title" style="margin-bottom: 0;">Hoạt Động Gần Đây Nhất</h2>
+          <a href="/admin/activities" class="btn btn-outline btn-sm">Xem tất cả nhật ký &rarr;</a>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 170px;">Thời Gian</th>
+                <th style="width: 220px;">Người Thực Hiện</th>
+                <th style="width: 130px;">Phân Quyền</th>
+                <th>API Route / Endpoint</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (recentActivities && recentActivities.length > 0) { %>
+                <% recentActivities.forEach(act => { %>
+                  <tr>
+                    <td class="activity-time"><%= new Date(act.created_at).toLocaleString('vi-VN') %></td>
+                    <td>
+                      <% if (act.username) { %>
+                        <strong><%= act.full_name %></strong> <span style="color: var(--text-muted); font-size: 0.82rem;">(@<%= act.username %>)</span>
+                      <% } else { %>
+                        <span style="color: var(--text-muted); font-style: italic;">Khách vãng lai</span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <% if (act.role === 'admin') { %>
+                        <span class="pill-badge pill-admin">Admin</span>
+                      <% } else if (act.role === 'instructor') { %>
+                        <span class="pill-badge pill-instructor">Giảng viên</span>
+                      <% } else if (act.role === 'student') { %>
+                        <span class="pill-badge pill-student">Sinh viên</span>
+                      <% } else { %>
+                        <span style="color: var(--text-light); font-size: 0.8rem;">---</span>
+                      <% } %>
+                    </td>
+                    <td class="activity-desc"><code class="id-pill" style="font-weight: 600; font-size: 0.84rem;"><%= act.action %></code></td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <tr>
+                  <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 20px;">
+                    Chưa có nhật ký hoạt động nào.
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 3. TÓM TẮT KHÓA HỌC MỚI NHẤT -->
+      <section class="panel-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 class="panel-title" style="margin-bottom: 0;">Khóa Học Mới Đăng Tải</h2>
+          <a href="/admin/courses" class="btn btn-outline btn-sm">Xem tất cả khóa học &rarr;</a>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;">Mã số</th>
+                <th>Tên Khóa Học</th>
+                <th>Giảng Viên Phụ Trách</th>
+                <th>Sĩ Số Học Viên</th>
+                <th>Ngày Khởi Tạo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% recentCourses.forEach(c => { %>
+                <tr>
+                  <td><code class="id-pill">#<%= c.id %></code></td>
+                  <td style="font-weight: 600; color: var(--brand-blue);"><%= c.title %></td>
+                  <td><%= c.instructor_name %></td>
+                  <td>
+                    <span class="pill-badge pill-student"><%= c.student_count %> học viên</span>
+                  </td>
+                  <td style="color: var(--text-muted); font-size: 0.85rem;"><%= new Date(c.created_at).toLocaleDateString('vi-VN') %></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+</body>
+</html>

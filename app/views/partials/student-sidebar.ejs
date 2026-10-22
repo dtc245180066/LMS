@@ -1,0 +1,54 @@
+<!-- views/partials/student-sidebar.ejs -->
+<aside class="admin-sidebar">
+  <div>
+    <div class="sidebar-brand">
+      <div class="brand-emblem">LMS</div>
+      <div class="brand-details">
+        <div class="brand-title">LMS Sinh Viên</div>
+        <div class="brand-subtitle">Cổng Đào Tạo ICTU</div>
+      </div>
+    </div>
+
+    <ul class="sidebar-nav">
+      <!-- TAB 1: TỔNG QUAN HỌC TẬP -->
+      <li>
+        <a href="/student/dashboard" class="<%= typeof active !== 'undefined' && active === 'dashboard' ? 'active' : '' %>">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <span>Tổng Quan</span>
+        </a>
+      </li>
+
+      <!-- TAB 2: KHÓA HỌC CỦA TÔI -->
+      <li>
+        <a href="/student/my-courses" class="<%= typeof active !== 'undefined' && active === 'my-courses' ? 'active' : '' %>">
+          <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <span>Khóa Học Của Tôi</span>
+        </a>
+      </li>
+
+      <!-- TAB 3: KHÁM PHÁ KHÓA HỌC -->
+      <li>
+        <a href="/courses" class="<%= typeof active !== 'undefined' && active === 'courses' ? 'active' : '' %>">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <span>Khám Phá Khóa Học</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="sidebar-footer">
+    <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+      <div class="sidebar-user">
+        <div class="user-avatar"><%= currentUser.full_name ? currentUser.full_name.charAt(0).toUpperCase() : 'S' %></div>
+        <div class="user-info">
+          <div class="user-name"><%= currentUser.full_name %></div>
+          <div class="user-role-label">Sinh viên</div>
+        </div>
+      </div>
+      <a href="/auth/logout" class="btn-sidebar-logout" title="Đăng xuất khỏi hệ thống">
+        <svg style="width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        <span>Đăng xuất</span>
+      </a>
+    <% } %>
+  </div>
+</aside>

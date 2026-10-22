@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>LMS</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/instructor/lessons.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+    
+    <!-- SIDEBAR GIẢNG VIÊN (3 TAB CHUẨN) -->
+    <%- include('../partials/instructor-sidebar', { active: 'courses' }) %>
+
+    <!-- VÙNG NỘI DUNG CHÍNH -->
+    <main class="admin-main">
+      
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-title">
+          <div style="margin-bottom: 6px;">
+            <a href="/instructor/courses/<%= course.id %>/lessons" style="color: var(--brand-blue); text-decoration: none; font-size: 0.88rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+              <svg style="width: 15px; height: 15px; stroke: currentColor; stroke-width: 2.2; fill: none;" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+              <span>Quay lại Giáo trình: <%= course.title %></span>
+            </a>
+          </div>
+          <h1>Thêm Bài Học Mới</h1>
+          <p>Môn học: <strong style="color: var(--brand-blue);"><%= course.title %></strong></p>
+        </div>
+      </header>
+
+      <!-- BỐ CỤC 2 CỘT: TRÁI = FORM SOẠN BÀI, PHẢI = MỤC LỤC BÀI ĐÃ CÓ -->
+      <div class="add-lesson-layout">
+        
+        <!-- CỘT TRÁI: FORM BIÊN SOẠN BÀI HỌC -->
+        <section class="panel-card">
+          <h2 class="panel-title">Nội Dung Bài Học Mới</h2>
+
+          <% if (typeof error !== 'undefined' && error) { %>
+            <div class="alert-banner alert-danger"><%= error %></div>
+          <% } %>
+
+          <form action="/instructor/courses/<%= course.id %>/add-lesson" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="title" class="form-label">Tiêu đề bài học:</label>
+              <input type="text" class="form-input" id="title" name="title" placeholder="VD: Bài 3: Hướng dẫn cấu hình Nginx Reverse Proxy..." required autofocus>
+            </div>
+
+            <div class="form-group">
+              <label for="lesson_order" class="form-label">Thứ tự bài học trong giáo trình (STT):</label>
+              <input type="number" class="form-input" id="lesson_order" name="lesson_order" value="<%= typeof nextOrder !== 'undefined' ? nextOrder : 1 %>" min="1" style="max-width: 140px;" required>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                Đã tự động tính theo bài tiếp theo (Bài <%= typeof nextOrder !== 'undefined' ? nextOrder : 1 %>).
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="material" class="form-label" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                <span>Tài liệu đính kèm (Slide, PDF, Mã nguồn, Bài tập...):</span>
+                <span style="font-size: 0.78rem; font-weight: 500; color: var(--text-muted);">Không bắt buộc &bull; Tối đa 50MB</span>
+              </label>
+              <div class="file-upload-box">
+                <input type="file" id="material" name="material" class="form-input-file">
+                <div class="file-upload-hint">
+                  <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  <div>
+                    <strong>Chọn tệp tài liệu từ máy tính</strong>
+                    <div style="font-size: 0.76rem; color: #64748b; margin-top: 3px;">
+                      Hỗ trợ đa định dạng: PDF, Word (.docx), PowerPoint (.pptx), Excel (.xlsx), Zip/Rar/7z, Văn bản (.txt, .md), Mã nguồn (.cpp, .py, .java, .js, .sql) và Hình ảnh.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="content" class="form-label">Nội dung chi tiết bài học:</label>
+              <textarea class="form-input" id="content" name="content" rows="10" placeholder="Nhập giáo trình, kiến thức, ví dụ mã nguồn hoặc bài tập thực hành..."></textarea>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; border-top: 1px solid var(--border-subtle); padding-top: 20px;">
+              <a href="/instructor/courses/<%= course.id %>/lessons" class="btn btn-outline">Hủy bỏ</a>
+              <button type="submit" class="btn btn-primary">Lưu Bài Học &rarr;</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- CỘT PHẢI: MỤC LỤC CÁC BÀI ĐÃ CÓ CỦA KHÓA ĐÓ -->
+        <aside class="panel-card">
+          <h3 class="panel-title" style="margin-bottom: 4px;">
+            Giáo Trình Hiện Có (<%= typeof lessons !== 'undefined' ? lessons.length : 0 %>)
+          </h3>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px;">
+            Danh sách bài giảng đã biên soạn để thầy/cô tiện theo dõi thứ tự:
+          </p>
+
+          <div class="lesson-preview-list">
+            <% if (typeof lessons !== 'undefined' && lessons.length > 0) { %>
+              <% lessons.forEach(l => { %>
+                <div class="lesson-preview-item">
+                  <span class="preview-order-pill">Bài <%= l.lesson_order %></span>
+                  <div class="preview-item-info">
+                    <div class="preview-item-title"><%= l.title %></div>
+                    <div class="preview-item-date"><%= new Date(l.created_at).toLocaleDateString('vi-VN') %></div>
+                  </div>
+                </div>
+              <% }); %>
+            <% } else { %>
+              <div style="font-size: 0.88rem; color: var(--text-muted); padding: 12px; background: #f8fafc; border-radius: 8px; text-align: center;">
+                Khóa này chưa có bài nào. Bài bạn đang tạo sẽ là bài mở đầu!
+              </div>
+            <% } %>
+
+            <!-- BÀI ĐANG SOẠN THẢO (HIGHLIGHT) -->
+            <div class="lesson-preview-item lesson-preview-draft">
+              <span class="preview-order-pill">Bài <%= typeof nextOrder !== 'undefined' ? nextOrder : 1 %></span>
+              <div class="preview-item-info">
+                <div class="preview-item-title" style="color: var(--brand-blue);">
+                  <em>(Đang soạn bài mới...)</em>
+                </div>
+                <div class="preview-item-date">Sẽ xuất hiện tại đây</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+
+    </main>
+
+  </div>
+
+</body>
+</html>

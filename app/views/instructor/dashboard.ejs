@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>LMS</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/instructor/dashboard.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+    
+    <!-- SIDEBAR GIẢNG VIÊN -->
+    <%- include('../partials/instructor-sidebar', { active: 'dashboard' }) %>
+
+    <!-- VÙNG NỘI DUNG CHÍNH -->
+    <main class="admin-main">
+      
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-title">
+          <h1>Bảng Giảng Dạy & Đào Tạo</h1>
+          <p>Chào mừng thầy/cô, <strong><%= currentUser.full_name %></strong>. Tổng quan số liệu các lớp phụ trách.</p>
+        </div>
+      </header>
+
+      <!-- 1. BỘ 4 CHỈ SỐ THỐNG KÊ CỦA RIÊNG GIẢNG VIÊN -->
+      <section class="metrics-grid">
+        <div class="metric-card card-blue">
+          <div class="metric-title">Khóa Học Phụ Trách</div>
+          <div class="metric-value"><%= metrics.course_count || 0 %></div>
+        </div>
+
+        <div class="metric-card card-green">
+          <div class="metric-title">Bài Giảng Đã Biên Soạn</div>
+          <div class="metric-value"><%= metrics.lesson_count || 0 %></div>
+        </div>
+
+        <div class="metric-card card-amber">
+          <div class="metric-title">Học Viên Theo Học</div>
+          <div class="metric-value"><%= metrics.student_count || 0 %></div>
+        </div>
+
+        <div class="metric-card card-purple">
+          <div class="metric-title">Lượt Bài Hoàn Thành</div>
+          <div class="metric-value"><%= metrics.completion_count || 0 %></div>
+        </div>
+      </section>
+
+      <!-- 2. TÓM TẮT KHÓA HỌC GẦN ĐÂY NHẤT -->
+      <section class="panel-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 class="panel-title" style="margin-bottom: 0;">Khóa Học Đang Giảng Dạy</h2>
+          <a href="/instructor/courses" class="btn btn-outline btn-sm">Xem tất cả khóa học &rarr;</a>
+        </div>
+
+        <% if (recentCourses && recentCourses.length > 0) { %>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 70px;">Mã số</th>
+                  <th>Tên Khóa Học</th>
+                  <th>Trạng Thái</th>
+                  <th>Số Bài Giảng</th>
+                  <th>Sĩ Số Học Viên</th>
+                  <th style="text-align: right;">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% recentCourses.forEach(c => { %>
+                  <tr>
+                    <td><code class="id-pill">#<%= c.id %></code></td>
+                    <td style="font-weight: 600; color: var(--text-title);"><%= c.title %></td>
+                    <td>
+                      <% if (c.status === 'draft') { %>
+                        <span class="pill-badge" style="background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1;">Bản nháp</span>
+                      <% } else { %>
+                        <span class="pill-badge pill-success">Công khai</span>
+                      <% } %>
+                    </td>
+                    <td><%= c.total_lessons %> bài</td>
+                    <td>
+                      <span class="pill-badge pill-student"><%= c.total_students %> học viên</span>
+                    </td>
+                    <td style="text-align: right;">
+                      <a href="/instructor/courses/<%= c.id %>/lessons" class="btn btn-outline btn-sm">
+                        Quản lý bài học &rarr;
+                      </a>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="alert-box alert-info">
+            Thầy/cô chưa tạo khóa học nào. Hãy vào mục <a href="/instructor/courses" style="color: var(--brand-blue); font-weight: 600;">Khóa Học Phụ Trách</a> để bắt đầu mở lớp.
+          </div>
+        <% } %>
+      </section>
+
+      <!-- 3. TÓM TẮT SINH VIÊN VỪA GHI DANH -->
+      <section class="panel-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 class="panel-title" style="margin-bottom: 0;">Sinh Viên Vừa Ghi Danh Mới Nhất</h2>
+          <a href="/instructor/students" class="btn btn-outline btn-sm">Xem tiến độ tất cả học viên &rarr;</a>
+        </div>
+
+        <% if (recentEnrollments && recentEnrollments.length > 0) { %>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Thời Gian Ghi Danh</th>
+                  <th>Họ và Tên Sinh Viên</th>
+                  <th>Tài Khoản</th>
+                  <th>Khóa Học Đăng Ký</th>
+                  <th style="text-align: right;">Tiến Độ Học Tập</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% recentEnrollments.forEach(e => { %>
+                  <tr>
+                    <td style="color: var(--text-muted); font-size: 0.85rem;"><%= new Date(e.enrolled_at).toLocaleString('vi-VN') %></td>
+                    <td style="font-weight: 600; color: var(--text-title);"><%= e.full_name %></td>
+                    <td><code class="id-pill">@<%= e.username %></code></td>
+                    <td style="color: var(--brand-blue); font-weight: 500;"><%= e.course_title %></td>
+                    <td style="text-align: right;">
+                      <a href="/instructor/students?studentId=<%= e.student_id %>" class="btn btn-outline btn-sm">
+                        Xem tiến độ &rarr;
+                      </a>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div style="text-align: center; color: var(--text-muted); padding: 20px;">
+            Chưa có sinh viên nào ghi danh vào các lớp của thầy/cô.
+          </div>
+        <% } %>
+      </section>
+
+    </main>
+
+  </div>
+
+</body>
+</html>

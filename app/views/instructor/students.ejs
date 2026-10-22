@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>LMS</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/instructor/students.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+    
+    <!-- SIDEBAR GIẢNG VIÊN (3 TAB CHUẨN) -->
+    <%- include('../partials/instructor-sidebar', { active: 'students' }) %>
+
+    <!-- VÙNG NỘI DUNG CHÍNH -->
+    <main class="admin-main">
+      
+      <% if (mode === 'detail') { %>
+        <!-- ================================================================
+             TẦNG 2 & 3: CÁC KHÓA HỌC CỦA SINH VIÊN (CHỈ HIỆN KHÓA, BẤM VÀO MỚI HIỆN BÀI)
+             ================================================================ -->
+        
+        <!-- TOP BREADCRUMB -->
+        <header class="top-header" style="margin-bottom: 20px;">
+          <div class="header-title">
+            <div style="margin-bottom: 8px;">
+              <a href="/instructor/students" class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 4px;">
+                <svg style="width: 15px; height: 15px; stroke: currentColor; stroke-width: 2.2; fill: none;" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                <span>Quay lại danh sách sinh viên</span>
+              </a>
+            </div>
+            <h1>Tiến Độ Học Tập Của Sinh Viên</h1>
+            <p>Danh sách các môn học đang theo học. Nhấp vào <strong>"Xem chi tiết bài học"</strong> ở từng môn để kiểm tra bài giảng.</p>
+          </div>
+        </header>
+
+        <!-- THẺ TỔNG QUAN SINH VIÊN -->
+        <div class="student-profile-card">
+          <div class="student-profile-left">
+            <div class="student-avatar-lg">
+              <%= student.full_name ? student.full_name.charAt(0).toUpperCase() : 'S' %>
+            </div>
+            <div>
+              <div class="student-profile-name"><%= student.full_name %></div>
+              <div class="student-profile-meta">
+                Tài khoản: <code class="id-pill">@<%= student.username %></code> &bull; 
+                Đang học <strong><%= courses.length %></strong> khóa học của thầy/cô
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <span class="pill-badge <%= overallProgress >= 100 ? 'pill-success' : 'pill-student' %>" style="padding: 8px 18px; font-size: 0.92rem;">
+              Tổng hoàn thành: <%= overallCompleted %> / <%= overallTotal %> bài (<%= overallProgress %>%)
+            </span>
+          </div>
+        </div>
+
+        <!-- THANH TÌM KIẾM KHÓA HỌC CỦA BẠN NÀY -->
+        <% if (courses && courses.length > 1 || (typeof courseSearch !== 'undefined' && courseSearch)) { %>
+          <form action="/instructor/students" method="GET" class="filter-search-bar" style="margin-bottom: 20px;">
+            <input type="hidden" name="studentId" value="<%= student.id %>">
+            <div class="search-input-wrap">
+              <svg style="width: 16px; height: 16px; stroke: #94a3b8; stroke-width: 2; fill: none;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" name="courseSearch" class="search-input" placeholder="Tìm môn học của sinh viên này..." value="<%= typeof courseSearch !== 'undefined' ? courseSearch : '' %>">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Tìm môn</button>
+            <% if (typeof courseSearch !== 'undefined' && courseSearch) { %>
+              <a href="/instructor/students?studentId=<%= student.id %>" class="btn btn-outline btn-sm">Đặt lại</a>
+            <% } %>
+          </form>
+        <% } %>
+
+        <!-- DANH SÁCH CÁC KHÓA HỌC (TẦNG 2 - CHỈ HIỂN THỊ KHÓA) -->
+        <section>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2 class="panel-title" style="margin-bottom: 0;">
+              Danh Sách Khóa Học Đang Học (<%= courses.length %> môn)
+            </h2>
+          </div>
+
+          <% if (courses && courses.length > 0) { %>
+            <% courses.forEach(c => { %>
+              <div class="student-course-card">
+                
+                <!-- HEADER KHÓA HỌC (CHỈ HIỂN THỊ THÔNG TIN MÔN & TIẾN ĐỘ) -->
+                <div class="student-course-header">
+                  <div>
+                    <h3 class="student-course-title">
+                      <%= c.course_title %>
+                    </h3>
+                    <div class="student-course-meta">
+                      Ghi danh ngày: <%= new Date(c.enrolled_at).toLocaleDateString('vi-VN') %> &bull; 
+                      Trạng thái: 
+                      <% if (c.course_status === 'published') { %>
+                        <span style="color: var(--emerald-green); font-weight: 600;">Đang mở</span>
+                      <% } else { %>
+                        <span style="color: #64748b;">Bản nháp</span>
+                      <% } %>
+                    </div>
+                  </div>
+
+                  <div style="min-width: 240px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.84rem; font-weight: 600; margin-bottom: 4px;">
+                      <span style="color: var(--text-title);">Tiến độ môn:</span>
+                      <span class="progress-percent <%= c.progress >= 100 ? 'completed' : '' %>">
+                        <%= c.completed_lessons %> / <%= c.total_lessons %> bài (<%= c.progress %>%)
+                      </span>
+                    </div>
+                    <div class="mini-progress-bar">
+                      <div class="mini-progress-fill <%= c.progress >= 100 ? 'completed' : '' %>" <%- `style="width: ${c.progress}%;"` %>></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- BẤM VÀO ĐÂY MỚI HIỆN RA TỪNG BÀI (TẦNG 3 - MẶC ĐỊNH ĐÓNG) -->
+                <details class="course-lessons-accordion">
+                  <summary class="accordion-toggle">
+                    <span class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                      <svg style="width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                      <span>Xem chi tiết bài học (<%= c.lessons ? c.lessons.length : 0 %> bài) &darr;</span>
+                    </span>
+                  </summary>
+
+                  <% if (c.lessons && c.lessons.length > 0) { %>
+                    <div class="student-lesson-checklist">
+                      <% c.lessons.forEach(l => { %>
+                        <div class="lesson-check-row <%= l.is_completed ? 'completed' : 'pending' %>">
+                          <div class="lesson-check-indicator">
+                            <% if (l.is_completed) { %>
+                              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <% } else { %>
+                              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <% } %>
+                          </div>
+
+                          <div class="lesson-check-info">
+                            <div class="lesson-check-title">
+                              <span class="lesson-order-tag">Bài <%= l.lesson_order %></span>
+                              <strong><%= l.lesson_title %></strong>
+                            </div>
+                            
+                            <div class="lesson-check-meta">
+                              <% if (l.is_completed) { %>
+                                <span class="status-done">
+                                  <svg style="width: 13px; height: 13px; stroke: currentColor; stroke-width: 2.5; fill: none;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                  Đã học xong: <%= new Date(l.completed_at).toLocaleString('vi-VN') %>
+                                </span>
+                              <% } else { %>
+                                <span class="status-pending">
+                                  Chưa hoàn thành bài học này
+                                </span>
+                              <% } %>
+                            </div>
+                          </div>
+                        </div>
+                      <% }); %>
+                    </div>
+                  <% } else { %>
+                    <div style="font-size: 0.88rem; color: var(--text-muted); padding: 12px; background: #f8fafc; border-radius: 8px; margin-top: 10px;">
+                      Môn học này hiện chưa có bài giảng nào được đăng tải.
+                    </div>
+                  <% } %>
+                </details>
+
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="panel-card" style="text-align: center; color: var(--text-muted); padding: 32px;">
+              <%= typeof courseSearch !== 'undefined' && courseSearch ? 'Không tìm thấy môn học nào phù hợp với từ khóa "' + courseSearch + '".' : 'Sinh viên này chưa ghi danh vào khóa học nào của thầy/cô.' %>
+            </div>
+          <% } %>
+
+          <div style="margin-top: 24px;">
+            <a href="/instructor/students" class="btn btn-outline">&larr; Quay lại danh sách sinh viên</a>
+          </div>
+        </section>
+
+      <% } else { %>
+        <!-- ================================================================
+             TẦNG 1: DANH SÁCH SINH VIÊN DUY NHẤT (CÓ TÌM KIẾM & LỌC THEO KHÓA)
+             ================================================================ -->
+        
+        <header class="top-header">
+          <div class="header-title">
+            <div style="margin-bottom: 6px;">
+              <a href="/instructor/courses" style="color: var(--brand-blue); text-decoration: none; font-size: 0.88rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                <svg style="width: 15px; height: 15px; stroke: currentColor; stroke-width: 2.2; fill: none;" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                <span>Quay lại Khóa Học Của Tôi</span>
+              </a>
+            </div>
+            <h1>Tiến Độ Học Viên</h1>
+            <p>Danh sách sinh viên theo học. Bấm vào sinh viên để xem các khóa học của bạn đó.</p>
+          </div>
+        </header>
+
+        <!-- THANH TÌM KIẾM SINH VIÊN VÀ LỌC THEO KHÓA HỌC -->
+        <form action="/instructor/students" method="GET" class="filter-search-bar">
+          <div class="search-input-wrap">
+            <svg style="width: 16px; height: 16px; stroke: #94a3b8; stroke-width: 2; fill: none;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" name="search" class="search-input" placeholder="Tìm theo tên sinh viên hoặc @username..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+          </div>
+
+          <select name="courseId" class="filter-select">
+            <option value="">-- Tất cả khóa học (<%= typeof courses !== 'undefined' ? courses.length : 0 %>) --</option>
+            <% if (typeof courses !== 'undefined') { %>
+              <% courses.forEach(c => { %>
+                <option value="<%= c.id %>" <%= typeof courseId !== 'undefined' && courseId === c.id ? 'selected' : '' %>>
+                  <%= c.title %>
+                </option>
+              <% }); %>
+            <% } %>
+          </select>
+
+          <button type="submit" class="btn btn-primary btn-sm">Tìm kiếm & Lọc</button>
+          <% if ((typeof search !== 'undefined' && search) || (typeof courseId !== 'undefined' && courseId)) { %>
+            <a href="/instructor/students" class="btn btn-outline btn-sm">Đặt lại</a>
+          <% } %>
+        </form>
+
+        <% if (students && students.length > 0) { %>
+          <section class="panel-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h2 class="panel-title" style="margin-bottom: 0;">Danh Sách Sinh Viên (<%= students.length %>)</h2>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width: 60px;">STT</th>
+                    <th>Họ và Tên Sinh Viên</th>
+                    <th>Tài Khoản</th>
+                    <th>Số Khóa Đang Học</th>
+                    <th style="width: 240px;">Tổng Tiến Độ Hoàn Thành</th>
+                    <th style="text-align: right; width: 180px;">Hành Động</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% students.forEach((s, idx) => { %>
+                    <tr>
+                      <td><code class="id-pill">#<%= idx + 1 %></code></td>
+                      <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                          <div class="student-avatar-badge">
+                            <%= s.full_name ? s.full_name.charAt(0).toUpperCase() : 'S' %>
+                          </div>
+                          <span style="font-weight: 600; color: var(--text-title);"><%= s.full_name %></span>
+                        </div>
+                      </td>
+                      <td><code class="id-pill">@<%= s.username %></code></td>
+                      <td>
+                        <span class="pill-badge pill-instructor">
+                          <%= s.course_count %> khóa học
+                        </span>
+                      </td>
+                      <td>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px;">
+                          <span><%= s.completed_lessons %> / <%= s.total_lessons %> bài</span>
+                          <span class="progress-percent <%= s.progress >= 100 ? 'completed' : '' %>">
+                            <%= s.progress %>%
+                          </span>
+                        </div>
+                        <div class="mini-progress-bar">
+                          <div class="mini-progress-fill <%= s.progress >= 100 ? 'completed' : '' %>" <%- `style="width: ${s.progress}%;"` %>></div>
+                        </div>
+                      </td>
+                      <td style="text-align: right;">
+                        <a href="/instructor/students?studentId=<%= s.student_id %>" class="btn btn-primary btn-sm">
+                          Xem tiến độ &rarr;
+                        </a>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- PHÂN TRANG -->
+            <%- include('../partials/pagination', { pagination }) %>
+          </section>
+        <% } else { %>
+          <div class="panel-card" style="text-align: center; padding: 48px 24px;">
+            <svg style="width: 48px; height: 48px; stroke: #94a3b8; stroke-width: 1.5; fill: none; margin-bottom: 12px;" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            <h3 style="font-size: 1.15rem; color: var(--text-title); margin-bottom: 6px;">
+              <%= (typeof search !== 'undefined' && search) || (typeof courseId !== 'undefined' && courseId) ? 'Không tìm thấy sinh viên nào phù hợp' : 'Chưa có sinh viên ghi danh' %>
+            </h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+              <%= (typeof search !== 'undefined' && search) || (typeof courseId !== 'undefined' && courseId) ? 'Vui lòng kiểm tra lại từ khóa tìm kiếm hoặc bỏ bộ lọc khóa học.' : 'Chưa có sinh viên nào ghi danh vào bất kỳ khóa học nào của thầy/cô.' %>
+            </p>
+          </div>
+        <% } %>
+
+      <% } %>
+
+    </main>
+
+  </div>
+
+</body>
+</html>

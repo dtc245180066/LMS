@@ -1,0 +1,27 @@
+/* ==========================================================================
+   ADMIN AUDIT ACTIVITIES STYLESHEET (/admin/activities)
+   Exclusively for System Audit Logs, Timestamps & Activity Feeds
+   ========================================================================== */
+
+.activity-time {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.activity-desc {
+  font-weight: 500;
+  color: var(--text-title);
+  word-break: break-all;
+}
+
+.activity-badge-method {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #f1f5f9;
+  color: #334155;
+}

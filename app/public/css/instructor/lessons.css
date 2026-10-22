@@ -1,0 +1,190 @@
+/* ==========================================================================
+   INSTRUCTOR LESSONS & ADD-LESSON STYLES (/instructor/courses/:id/lessons)
+   ========================================================================== */
+
+/* === BỐ CỤC 2 CỘT CHO TRANG THÊM BÀI HỌC === */
+.add-lesson-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .add-lesson-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lesson-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.lesson-preview-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-white);
+  transition: all 0.15s ease;
+}
+
+.lesson-preview-item:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.lesson-preview-draft {
+  border: 1.5px dashed var(--brand-blue);
+  background: #eff6ff;
+}
+
+.preview-order-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 3px 7px;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+.lesson-preview-draft .preview-order-pill {
+  background: var(--brand-blue);
+  color: #fff;
+}
+
+.preview-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.preview-item-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-title);
+  line-height: 1.35;
+  margin-bottom: 2px;
+}
+
+.preview-item-date {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* === NÚT XÓA BÀI HỌC === */
+.btn-delete {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 6px;
+  color: #dc2626;
+  background: #ffffff;
+  border: 1px solid #fca5a5;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.2;
+}
+
+.btn-delete:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
+  color: #b91c1c;
+  box-shadow: 0 1px 3px rgba(220, 38, 38, 0.1);
+}
+
+.btn-delete:active {
+  background: #fee2e2;
+  transform: translateY(1px);
+}
+
+.btn-delete svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  fill: none;
+  flex-shrink: 0;
+}
+
+/* === KHUNG TẢI LÊN TÀI LIỆU HỌC TẬP === */
+.file-upload-box {
+  position: relative;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  padding: 16px 18px;
+  transition: all 0.2s ease;
+}
+
+.file-upload-box:hover,
+.file-upload-box:focus-within {
+  border-color: var(--brand-blue);
+  background: #eff6ff;
+}
+
+.form-input-file {
+  width: 100%;
+  font-size: 0.88rem;
+  color: var(--text-title);
+  cursor: pointer;
+  background: #ffffff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.file-upload-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 10px;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.file-upload-hint svg {
+  width: 22px;
+  height: 22px;
+  stroke: var(--brand-blue);
+  stroke-width: 2;
+  fill: none;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Huy hiệu tài liệu đính kèm trên danh sách bài */
+.attachment-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  color: var(--brand-blue);
+  text-decoration: none;
+  background: #eff6ff;
+  padding: 3px 8px;
+  border-radius: 5px;
+  border: 1px solid #bfdbfe;
+  transition: all 0.15s ease;
+  margin-top: 4px;
+}
+
+.attachment-pill:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: var(--brand-blue-hover);
+}
+
+
+

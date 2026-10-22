@@ -1,0 +1,47 @@
+/* ==========================================================================
+   INSTRUCTOR ENROLLMENT APPROVALS STYLESHEET (/instructor/enrollments)
+   Exclusively for Student Course Registration Approvals & Audit Trail
+   ========================================================================== */
+
+.student-avatar-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: var(--brand-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border: 1px solid #bfdbfe;
+  flex-shrink: 0;
+}
+
+.approval-btn-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.audit-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.audit-status-approved {
+  background: var(--emerald-light);
+  color: var(--emerald-green);
+  border: 1px solid var(--emerald-border);
+}
+
+.audit-status-rejected {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}

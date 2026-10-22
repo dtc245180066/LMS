@@ -1,0 +1,163 @@
+/* ==========================================================================
+   COURSES CATALOG & DETAIL SPECIFIC STYLESHEET (/courses, /courses/:id)
+   Contains styles exclusive to Course exploration and Curriculum syllabus
+   ========================================================================== */
+
+/* === LƯỚI KHÓA HỌC (ACADEMIC COURSE CATALOG) === */
+.courses-grid, .academic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.course-card, .course-box {
+  background: var(--surface-white);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.course-card:hover, .course-box:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: #cbd5e1;
+}
+
+.course-meta-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.course-tag {
+  background: var(--brand-blue-light);
+  color: var(--brand-blue);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+}
+
+.lesson-count-tag {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.course-card h3, .course-card h4, .course-box h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-title);
+  line-height: 1.4;
+  margin-bottom: 8px;
+  letter-spacing: -0.015em;
+}
+
+.course-card p, .course-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin-bottom: 20px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.course-instructor-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  color: var(--text-body);
+}
+
+.instructor-icon-circle {
+  width: 28px;
+  height: 28px;
+  background: #e2e8f0;
+  color: #334155;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.76rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.course-footer {
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+  margin-top: auto;
+}
+
+/* === BỐ CỤC 2 CỘT CHO TRANG CHI TIẾT KHÓA HỌC === */
+.two-col-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .two-col-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lesson-content-body {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #334155;
+  margin: 20px 0 32px;
+  white-space: pre-line;
+}
+
+/* Danh sách bài học (Curriculum) */
+.curriculum-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.curriculum-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-body);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.curriculum-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.curriculum-item.active {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: var(--brand-blue);
+  font-weight: 600;
+}
+

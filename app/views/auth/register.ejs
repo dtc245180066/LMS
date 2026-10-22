@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>LMS</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/auth/register.css">
+</head>
+<body>
+
+  <div class="auth-viewport">
+    <div class="auth-box">
+      
+      <div class="auth-header">
+        <div class="auth-icon">LMS</div>
+        <h1 class="auth-title">Đăng Ký Học Viên</h1>
+        <p class="auth-subtitle">Tạo tài khoản học trực tuyến tại LMS ICTU</p>
+      </div>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert-banner alert-danger" style="font-size: 0.88rem; padding: 12px 14px;">
+          <%= error %>
+        </div>
+      <% } %>
+
+      <form action="/auth/register" method="POST">
+        <div class="auth-field">
+          <label for="full_name" class="auth-label">Họ và tên của bạn</label>
+          <input type="text" class="auth-input" id="full_name" name="full_name" placeholder="Nguyễn Văn A..." required autofocus>
+        </div>
+
+        <div class="auth-field">
+          <label for="username" class="auth-label">Tên đăng nhập</label>
+          <input type="text" class="auth-input" id="username" name="username" placeholder="Nhập tên đăng nhập..." required>
+        </div>
+
+        <div class="auth-field" style="margin-bottom: 26px;">
+          <label for="password" class="auth-label">Mật khẩu</label>
+          <input type="password" class="auth-input" id="password" name="password" placeholder="Nhập mật khẩu bí mật..." required>
+        </div>
+
+        <button type="submit" class="btn-submit">
+          Đăng Ký Tài Khoản
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Đã có tài khoản trên hệ thống? 
+        <a href="/auth/login">Đăng nhập ngay</a>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

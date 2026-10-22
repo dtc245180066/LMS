@@ -1,0 +1,76 @@
+/* ==========================================================================
+   ADMIN DASHBOARD STYLESHEET (/admin/dashboard)
+   Exclusively for Admin Overview, System KPIs & Metrics Grid
+   ========================================================================== */
+
+/* === BỘ CHỈ SỐ THỐNG KÊ (METRICS OVERVIEW - 5 CỘT) === */
+.metrics-grid, .stats-overview {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 1200px) {
+  .metrics-grid, .stats-overview {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .metrics-grid, .stats-overview {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metric-card, .stat-item {
+  background: var(--surface-white);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.metric-card:hover, .stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+
+.metric-card::before, .stat-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #cbd5e1;
+}
+
+.metric-card.card-blue::before { background: var(--brand-blue); }
+.metric-card.card-green::before { background: var(--emerald-green); }
+.metric-card.card-amber::before { background: var(--amber-orange); }
+.metric-card.card-purple::before { background: #8b5cf6; }
+.metric-card.card-red::before { background: var(--crimson-red); }
+
+.metric-title {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-title);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}

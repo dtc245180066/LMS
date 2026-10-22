@@ -1,0 +1,206 @@
+/* ==========================================================================
+   INSTRUCTOR COURSE MANAGEMENT STYLES (/instructor/courses)
+   ========================================================================== */
+
+/* === THANH TÌM KIẾM & BỘ LỌC KHÓA HỌC === */
+.filter-search-bar {
+  background: var(--surface-white);
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.search-input-wrap {
+  flex: 1;
+  min-width: 240px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-wrap svg {
+  position: absolute;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  stroke: #94a3b8;
+  stroke-width: 2;
+  fill: none;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px 8px 36px;
+  font-size: 0.88rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: #fff;
+  color: var(--text-title);
+}
+
+.search-input:focus {
+  border-color: var(--brand-blue);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.filter-select {
+  padding: 8px 12px;
+  font-size: 0.88rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: #fff;
+  color: var(--text-title);
+  min-width: 200px;
+}
+
+/* === LƯỚI THẺ KHÓA HỌC TRỰC QUAN === */
+.courses-deck {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.course-deck-card {
+  background: var(--surface-white);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 22px 24px;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.course-deck-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: var(--shadow-card-hover);
+}
+
+.deck-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 14px;
+}
+
+.deck-badges {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pill-draft {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}
+
+.deck-card-body {
+  margin-bottom: 18px;
+}
+
+.deck-card-title {
+  font-size: 1.22rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-bottom: 8px;
+  letter-spacing: -0.015em;
+}
+
+.deck-card-title a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.deck-card-title a:hover {
+  color: var(--brand-blue);
+}
+
+.deck-card-desc {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin-bottom: 16px;
+  max-width: 900px;
+}
+
+.deck-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+  background: #f8fafc;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  font-size: 0.88rem;
+  color: #475569;
+}
+
+.deck-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deck-stat-item svg {
+  width: 17px;
+  height: 17px;
+  stroke: var(--brand-blue);
+  stroke-width: 2;
+  fill: none;
+}
+
+.deck-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+
+/* Nút chuyển đổi trạng thái */
+.btn-lock-toggle {
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.2;
+}
+
+.btn-lock {
+  background: #fff;
+  color: var(--crimson-red);
+  border: 1px solid var(--crimson-border);
+}
+
+.btn-lock:hover {
+  background: var(--crimson-light);
+  border-color: var(--crimson-red);
+}
+
+.btn-unlock {
+  background: #fff;
+  color: var(--emerald-green);
+  border: 1px solid var(--emerald-border);
+}
+
+.btn-unlock:hover {
+  background: var(--emerald-light);
+  border-color: var(--emerald-green);
+}
+

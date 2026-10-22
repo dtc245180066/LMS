@@ -1,0 +1,171 @@
+/* ==========================================================================
+   STUDENT LESSON ROOM STYLESHEET (/student/course/:cid/lesson/:lid)
+   Exclusively for Learning Interface, Breadcrumbs, Player & Curriculum Tree
+   ========================================================================== */
+
+/* === BREADCRUMBS ĐIỀU HƯỚNG === */
+.breadcrumbs-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.breadcrumbs-bar a {
+  color: var(--brand-blue);
+  text-decoration: none;
+  font-weight: 500;
+}
+.breadcrumbs-bar a:hover {
+  text-decoration: underline;
+}
+
+.lesson-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.lesson-status-pill.done {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.lesson-status-pill.pending {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+/* === 2 CỘT PHÒNG HỌC === */
+.two-col-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 980px) {
+  .two-col-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lesson-content-card {
+  background: var(--surface-white);
+  border: 1px solid var(--border-card);
+  border-radius: 14px;
+  padding: 32px 36px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.lesson-content-body {
+  font-size: 1.02rem;
+  line-height: 1.85;
+  color: #1e293b;
+  margin: 24px 0 36px;
+  white-space: pre-line;
+}
+
+/* THANH ĐIỀU HƯỚNG BÀI HỌC (PREV / COMPLETE / NEXT) */
+.lesson-nav-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 24px;
+}
+
+.lesson-completed-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* SIDEBAR MỤC LỤC GIÁO TRÌNH BÊN PHẢI */
+.curriculum-sidebar-card {
+  background: var(--surface-white);
+  border: 1px solid var(--border-card);
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 20px;
+}
+
+.curriculum-sidebar-header {
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.curriculum-sidebar-header h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-bottom: 8px;
+}
+
+.curriculum-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.curriculum-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+  background: #f8fafc;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-body);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.curriculum-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.curriculum-item.active {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: var(--brand-blue);
+  font-weight: 600;
+}
+
+.lesson-done-badge {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.lesson-pending-badge {
+  color: #94a3b8;
+  font-size: 0.78rem;
+}

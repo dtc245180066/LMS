@@ -1,0 +1,332 @@
+/* ==========================================================================
+   STUDENT DASHBOARD STYLESHEET (/student/dashboard)
+   Exclusively for Student Overview, Metrics & Resume Learning Shortcut
+   ========================================================================== */
+
+/* === RESUME CALLOUT BANNER === */
+.student-resume-banner {
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 16px 22px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.05);
+}
+
+.resume-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.resume-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.1);
+  flex-shrink: 0;
+}
+
+.resume-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--brand-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+
+.resume-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin: 0 0 2px 0;
+}
+
+.resume-meta {
+  font-size: 0.84rem;
+  color: var(--text-body);
+}
+
+/* === BỘ 4 CHỈ SỐ THỐNG KÊ HỌC TẬP (LIGHT DESIGN) === */
+.student-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 1024px) {
+  .student-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .student-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.student-metric-card {
+  background: var(--surface-white);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.student-metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.student-metric-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #e2e8f0;
+}
+
+.student-metric-card.card-blue::before { background: var(--brand-blue); }
+.student-metric-card.card-amber::before { background: var(--amber-orange); }
+.student-metric-card.card-green::before { background: var(--emerald-green); }
+.student-metric-card.card-indigo::before { background: #6366f1; }
+
+.metric-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.metric-label {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.metric-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metric-icon-wrap.icon-blue { background: #eff6ff; }
+.metric-icon-wrap.icon-amber { background: #fef3c7; }
+.metric-icon-wrap.icon-green { background: #ecfdf5; }
+.metric-icon-wrap.icon-indigo { background: #eef2ff; }
+
+.metric-number {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--text-title);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.metric-caption {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.metric-meter-bar {
+  width: 100%;
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 99px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.metric-meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand-blue) 0%, #6366f1 100%);
+  border-radius: 99px;
+}
+
+/* === LƯỚI KHÓA HỌC TRÊN DASHBOARD === */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 22px;
+  margin-bottom: 32px;
+}
+
+.course-card {
+  background: var(--surface-white);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.course-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: #cbd5e1;
+}
+
+.course-meta-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.course-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+}
+
+.course-tag.enrolled {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.course-tag.completed {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.lesson-count-tag {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  background: #f8fafc;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid #f1f5f9;
+}
+
+.course-card h3 {
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--text-title);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.course-card h3 a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.course-card h3 a:hover {
+  color: var(--brand-blue);
+}
+
+.course-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.course-instructor-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  color: var(--text-body);
+}
+
+.instructor-icon-circle {
+  width: 28px;
+  height: 28px;
+  background: #e0e7ff;
+  color: var(--brand-blue);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* KHỐI TIẾN ĐỘ TRONG CARD */
+.progress-container {
+  margin: 14px 0 16px;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.progress-info strong {
+  font-weight: 700;
+}
+
+.progress-track {
+  width: 100%;
+  height: 7px;
+  background: #e2e8f0;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+
+.progress-fill.completed {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+.course-footer {
+  padding-top: 14px;
+  border-top: 1px solid #f1f5f9;
+  margin-top: auto;
+}
+
+.course-footer-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

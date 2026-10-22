@@ -1,0 +1,89 @@
+services:
+  # ============================================================================
+  # 1. DỊCH VỤ CƠ SỞ DỮ LIỆU MYSQL 8.0
+  # ============================================================================
+  db:
+    image: mysql:8.0
+    container_name: lms_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d:ro
+    networks:
+      - dbnet
+
+  # ============================================================================
+  # 2. DỊCH VỤ WEB ỨNG DỤNG LMS (NODE.JS)
+  # ============================================================================
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: lms_app
+    restart: always
+    environment:
+      PORT: ${PORT}
+      DB_HOST: db
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      SESSION_SECRET: ${SESSION_SECRET}
+    volumes:
+      - ./app/public/uploads:/home/anlt/app/public/uploads
+    networks:
+      - webnet
+      - dbnet
+    depends_on:
+      - db
+
+  # ============================================================================
+  # 3. DỊCH VỤ NGINX REVERSE PROXY & HTTPS
+  # ============================================================================
+  nginx:
+    image: nginx:alpine
+    container_name: lms_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      - webnet
+    depends_on:
+      - app
+
+  # ============================================================================
+  # 4. DỊCH VỤ QUẢN TRỊ CSDL PHPMYADMIN
+  # ============================================================================
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: lms_phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    ports:
+      - "8080:80"
+    networks:
+      - webnet
+      - dbnet
+    depends_on:
+      - db
+
+volumes:
+  db_data:
+
+networks:
+  webnet:
+    driver: bridge
+  dbnet:
+    driver: bridge
+    internal: true

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>LMS</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/admin/courses.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+    
+    <!-- SIDEBAR QUẢN TRỊ VIÊN -->
+    <%- include('../partials/admin-sidebar', { active: 'courses' }) %>
+
+    <!-- VÙNG NỘI DUNG CHÍNH -->
+    <main class="admin-main">
+      
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-title">
+          <div style="margin-bottom: 6px;">
+            <a href="/admin/courses" style="color: var(--brand-blue); text-decoration: none; font-size: 0.88rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+              <svg style="width: 15px; height: 15px; stroke: currentColor; stroke-width: 2.2; fill: none;" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+              <span>Quay lại Khóa Học Toàn Trường</span>
+            </a>
+          </div>
+          <h1><%= course.title %></h1>
+          <p>Giảng viên phụ trách: <strong style="color: var(--brand-blue);"><%= course.instructor_name %></strong> &bull; Mã khóa: <code class="id-pill">#<%= course.id %></code></p>
+        </div>
+        <div class="header-actions">
+          <% if (course.status === 'published') { %>
+            <span class="course-status-pill course-status-published">Đang mở (Công khai)</span>
+          <% } else { %>
+            <span class="course-status-pill course-status-draft">Bản nháp (Đóng)</span>
+          <% } %>
+        </div>
+      </header>
+
+      <!-- 1. BẢNG THÔNG TIN TỔNG QUAN -->
+      <section class="panel-card" style="margin-bottom: 24px;">
+        <h2 class="panel-title">Mô Tả & Mục Tiêu Đào Tạo</h2>
+        <div style="font-size: 0.92rem; color: var(--text-body); line-height: 1.6; margin-bottom: 18px;">
+          <%= course.description || 'Chưa có thông tin mô tả chi tiết cho môn học này.' %>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+          <div style="background: #f8fafc; padding: 12px 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Số lượng bài giảng</div>
+            <div style="font-size: 1.25rem; font-weight: 800; color: var(--brand-blue); margin-top: 4px;"><%= lessons.length %> bài</div>
+          </div>
+          <div style="background: #f8fafc; padding: 12px 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Sĩ số sinh viên (Đã duyệt)</div>
+            <div style="font-size: 1.25rem; font-weight: 800; color: var(--emerald-green); margin-top: 4px;"><%= students.length %> sinh viên</div>
+          </div>
+          <div style="background: #f8fafc; padding: 12px 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Ngày khởi tạo môn</div>
+            <div style="font-size: 1rem; font-weight: 700; color: var(--text-title); margin-top: 4px;"><%= new Date(course.created_at).toLocaleDateString('vi-VN') %></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. DANH SÁCH BÀI GIẢNG TRONG GIÁO TRÌNH -->
+      <section class="panel-card" style="margin-bottom: 24px;">
+        <h2 class="panel-title">Giáo Trình & Nội Dung Bài Học (<%= lessons.length %> bài)</h2>
+
+        <% if (lessons && lessons.length > 0) { %>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 90px;">Thứ tự</th>
+                  <th>Tiêu Đề Bài Giảng</th>
+                  <th>Tài Liệu Đính Kèm</th>
+                  <th style="width: 140px; text-align: right;">Ngày Đăng Tải</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% lessons.forEach(l => { %>
+                  <tr>
+                    <td><code class="id-pill">Bài <%= l.lesson_order %></code></td>
+                    <td style="font-weight: 600; color: var(--text-title);"><%= l.title %></td>
+                    <td>
+                      <% if (l.attachment_path) { %>
+                        <a href="<%= l.attachment_path %>" target="_blank" download="<%= l.attachment_name %>" class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; padding: 4px 10px; color: var(--brand-blue); border-color: #bfdbfe; background: #eff6ff;">
+                          <svg style="width: 13px; height: 13px; stroke: currentColor; stroke-width: 2.2; fill: none;" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                          <span><%= l.attachment_name %></span>
+                          <% if (l.attachment_size) { %>
+                            <span style="opacity: 0.7;">(<%= l.attachment_size > 1048576 ? (l.attachment_size / 1048576).toFixed(1) + ' MB' : Math.round(l.attachment_size / 1024) + ' KB' %>)</span>
+                          <% } %>
+                        </a>
+                      <% } else { %>
+                        <span style="color: var(--text-muted); font-size: 0.82rem;">Không có tệp đính kèm</span>
+                      <% } %>
+                    </td>
+                    <td style="text-align: right; color: var(--text-muted); font-size: 0.85rem;"><%= new Date(l.created_at).toLocaleDateString('vi-VN') %></td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="alert-box alert-info">
+            Giảng viên phụ trách chưa đăng tải bài học nào cho khóa học này.
+          </div>
+        <% } %>
+      </section>
+
+      <!-- 3. DANH SÁCH SINH VIÊN ĐANG HỌC KHÓA NÀY -->
+      <section class="panel-card">
+        <h2 class="panel-title">Danh Sách Học Viên Đang Học (<%= students.length %> sinh viên)</h2>
+
+        <% if (students && students.length > 0) { %>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Sinh Viên</th>
+                  <th>Tài Khoản</th>
+                  <th>Ngày Xét Duyệt</th>
+                  <th style="width: 180px;">Tiến Độ Hoàn Thành</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% students.forEach(s => { %>
+                  <tr>
+                    <td style="font-weight: 600; color: var(--text-title);"><%= s.full_name %></td>
+                    <td><code class="id-pill">@<%= s.username %></code></td>
+                    <td style="color: var(--text-muted); font-size: 0.85rem;"><%= s.reviewed_at ? new Date(s.reviewed_at).toLocaleDateString('vi-VN') : 'Đã duyệt' %></td>
+                    <td>
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="flex: 1; height: 7px; background: #e2e8f0; border-radius: 99px; overflow: hidden;">
+                          <div style="width: <%= s.progress %>%; height: 100%; background: <%= s.progress === 100 ? 'var(--emerald-green)' : 'var(--brand-blue)' %>; border-radius: 99px;"></div>
+                        </div>
+                        <span style="font-size: 0.8rem; font-weight: 700; color: <%= s.progress === 100 ? 'var(--emerald-green)' : 'var(--brand-blue)' %>;"><%= s.progress %>%</span>
+                      </div>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="alert-box alert-info">
+            Chưa có sinh viên nào ghi danh hoặc được phê duyệt vào khóa học này.
+          </div>
+        <% } %>
+      </section>
+
+    </main>
+
+  </div>
+
+</body>
+</html>

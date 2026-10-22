@@ -1,0 +1,311 @@
+/* ==========================================================================
+   INSTRUCTOR STUDENT PROGRESS TRACKING STYLES (/instructor/students)
+   ========================================================================== */
+
+/* === THANH TÌM KIẾM & BỘ LỌC HỌC VIÊN === */
+.filter-search-bar {
+  background: var(--surface-white);
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.search-input-wrap {
+  flex: 1;
+  min-width: 240px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-wrap svg {
+  position: absolute;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  stroke: #94a3b8;
+  stroke-width: 2;
+  fill: none;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px 8px 36px;
+  font-size: 0.88rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: #fff;
+  color: var(--text-title);
+}
+
+.search-input:focus {
+  border-color: var(--brand-blue);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.filter-select {
+  padding: 8px 12px;
+  font-size: 0.88rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: #fff;
+  color: var(--text-title);
+  min-width: 220px;
+}
+
+/* === THẺ PROFILE SINH VIÊN ĐƯỢC CHỌN === */
+.student-profile-card {
+  background: var(--surface-white);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 22px 26px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.student-profile-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.student-avatar-lg {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #e0e7ff;
+  color: var(--brand-blue);
+  font-size: 1.35rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.student-profile-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-bottom: 4px;
+}
+
+.student-profile-meta {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+/* === THẺ KHÓA HỌC CỦA SINH VIÊN (TẦNG 2 & 3) === */
+.student-course-card {
+  background: var(--surface-white);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.student-course-card:hover {
+  border-color: #cbd5e1;
+}
+
+.student-course-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.student-course-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-bottom: 4px;
+}
+
+.student-course-meta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* THANH TIẾN ĐỘ */
+.mini-progress-bar {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.mini-progress-fill {
+  height: 100%;
+  background: var(--brand-blue);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.mini-progress-fill.completed {
+  background: var(--emerald-green);
+}
+
+.progress-percent {
+  font-weight: 600;
+  color: var(--brand-blue);
+}
+
+.progress-percent.completed {
+  color: var(--emerald-green);
+}
+
+/* ACCORDION XEM DANH SÁCH BÀI CỦA KHÓA */
+.course-lessons-accordion {
+  margin-top: 16px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 12px;
+}
+
+.accordion-toggle {
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--brand-blue);
+  padding: 6px 0;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.accordion-toggle:hover {
+  text-decoration: underline;
+}
+
+/* DANH SÁCH BÀI HỌC CHECKLIST */
+.student-lesson-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.lesson-check-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-white);
+  transition: all 0.15s ease;
+}
+
+.lesson-check-row.completed {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.lesson-check-row.pending {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.lesson-check-indicator {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.lesson-check-row.completed .lesson-check-indicator {
+  background: #dcfce7;
+  color: var(--emerald-green);
+}
+
+.lesson-check-row.completed .lesson-check-indicator svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--emerald-green);
+  stroke-width: 2.5;
+  fill: none;
+}
+
+.lesson-check-row.pending .lesson-check-indicator {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+
+.lesson-check-row.pending .lesson-check-indicator svg {
+  width: 15px;
+  height: 15px;
+  stroke: #94a3b8;
+  stroke-width: 2;
+  fill: none;
+}
+
+.lesson-check-info {
+  flex: 1;
+}
+
+.lesson-check-title {
+  font-size: 0.94rem;
+  color: var(--text-title);
+  margin-bottom: 4px;
+}
+
+.lesson-order-tag {
+  font-size: 0.74rem;
+  font-weight: 700;
+  background: #e2e8f0;
+  color: #475569;
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+.status-done {
+  color: var(--emerald-green);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+}
+
+.status-pending {
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.student-avatar-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e0e7ff;
+  color: var(--brand-blue);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>LMS</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/instructor/enrollments.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+    
+    <!-- SIDEBAR GIẢNG VIÊN (4 TAB CHUẨN) -->
+    <%- include('../partials/instructor-sidebar', { active: 'enrollments' }) %>
+
+    <!-- VÙNG NỘI DUNG CHÍNH -->
+    <main class="admin-main">
+      
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-title">
+          <h1>Duyệt Đăng Ký Khóa Học</h1>
+          <p>Xét duyệt yêu cầu ghi danh vào các lớp học do Thầy/Cô phụ trách đào tạo</p>
+        </div>
+        <div class="header-actions">
+          <span class="pill-badge <%= pendingList.length > 0 ? 'pill-pending' : 'pill-approved' %>" style="font-size: 0.88rem; padding: 6px 14px; font-weight: 700;">
+            <%= pendingList.length > 0 ? `⏳ ${pendingList.length} yêu cầu đang chờ duyệt` : '✓ Đã duyệt hết đơn' %>
+          </span>
+        </div>
+      </header>
+
+      <!-- FLASH MESSAGE THÔNG BÁO -->
+      <% if (typeof message !== 'undefined' && message) { %>
+        <div class="alert-banner alert-<%= messageType || 'success' %>" style="margin-bottom: 24px;">
+          <%= message %>
+        </div>
+      <% } %>
+
+      <!-- THANH LỌC THEO KHÓA HỌC -->
+      <form action="/instructor/enrollments" method="GET" class="filter-search-bar" style="margin-bottom: 24px;">
+        <select name="courseId" class="filter-select" style="min-width: 280px;">
+          <option value="">-- Tất cả khóa học của tôi (<%= courses.length %>) --</option>
+          <% courses.forEach(c => { %>
+            <option value="<%= c.id %>" <%= typeof courseId !== 'undefined' && courseId === c.id ? 'selected' : '' %>>
+              <%= c.title %>
+            </option>
+          <% }); %>
+        </select>
+
+        <button type="submit" class="btn btn-primary btn-sm">Lọc danh sách</button>
+        <% if (typeof courseId !== 'undefined' && courseId) { %>
+          <a href="/instructor/enrollments" class="btn btn-outline btn-sm">Bỏ lọc</a>
+        <% } %>
+      </form>
+
+      <!-- 1. BẢNG DANH SÁCH YÊU CẦU ĐANG CHỜ DUYỆT -->
+      <section class="panel-card" style="margin-bottom: 32px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 class="panel-title" style="margin-bottom: 0;">
+            Danh Sách Đơn Đăng Ký Đang Chờ Duyệt (<%= pendingList.length %>)
+          </h2>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">Sinh viên chỉ được vào học bài sau khi được duyệt</span>
+        </div>
+
+        <% if (pendingList && pendingList.length > 0) { %>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 60px;">STT</th>
+                  <th>Sinh Viên Yêu Cầu</th>
+                  <th>Tài Khoản</th>
+                  <th>Khóa Học Đăng Ký</th>
+                  <th style="width: 170px;">Thời Gian Gửi</th>
+                  <th style="text-align: right; width: 220px;">Hành Động Xét Duyệt</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% pendingList.forEach((item, idx) => { %>
+                  <tr>
+                    <td><code class="id-pill">#<%= idx + 1 %></code></td>
+                    <td>
+                      <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="student-avatar-badge">
+                          <%= item.student_name ? item.student_name.charAt(0).toUpperCase() : 'S' %>
+                        </div>
+                        <span style="font-weight: 600; color: var(--text-title);"><%= item.student_name %></span>
+                      </div>
+                    </td>
+                    <td><code class="id-pill">@<%= item.username %></code></td>
+                    <td>
+                      <strong style="color: var(--brand-blue);"><%= item.course_title %></strong>
+                    </td>
+                    <td style="color: var(--text-muted); font-size: 0.85rem;">
+                      <%= new Date(item.enrolled_at).toLocaleString('vi-VN') %>
+                    </td>
+                    <td style="text-align: right;">
+                      <div style="display: inline-flex; gap: 8px;">
+                        <!-- NÚT PHÊ DUYỆT -->
+                        <form action="/instructor/enrollments/<%= item.enrollment_id %>/approve" method="POST" style="margin: 0;">
+                          <button type="submit" class="btn btn-success btn-sm" style="display: inline-flex; align-items: center; gap: 4px;">
+                            <svg style="width:13px;height:13px;stroke:currentColor;stroke-width:2.5;fill:none" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Duyệt</span>
+                          </button>
+                        </form>
+
+                        <!-- NÚT TỪ CHỐI -->
+                        <form action="/instructor/enrollments/<%= item.enrollment_id %>/reject" method="POST" style="margin: 0;" onsubmit="return confirm('Bạn có chắc chắn muốn từ chối yêu cầu này không?');">
+                          <button type="submit" class="btn btn-outline btn-sm" style="color: #dc2626; border-color: #fca5a5; display: inline-flex; align-items: center; gap: 4px;">
+                            <svg style="width:13px;height:13px;stroke:currentColor;stroke-width:2.5;fill:none" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            <span>Từ chối</span>
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div style="text-align: center; padding: 48px 24px;">
+            <svg style="width: 48px; height: 48px; stroke: #10b981; stroke-width: 1.5; fill: none; margin-bottom: 12px;" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <h3 style="font-size: 1.15rem; color: var(--text-title); margin-bottom: 6px;">Không có yêu cầu nào đang chờ duyệt</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">
+              Toàn bộ các đơn đăng ký khóa học của sinh viên đã được xét duyệt đầy đủ.
+            </p>
+          </div>
+        <% } %>
+      </section>
+
+      <!-- 2. LỊCH SỬ XÉT DUYỆT GẦN ĐÂY -->
+      <section class="panel-card">
+        <h2 class="panel-title">Lịch Sử Xét Duyệt Gần Nhất</h2>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 60px;">Mã</th>
+                <th>Sinh Viên</th>
+                <th>Khóa Học</th>
+                <th>Thời Gian Duyệt</th>
+                <th style="text-align: right; width: 140px;">Kết Quả</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (recentHistory && recentHistory.length > 0) { %>
+                <% recentHistory.forEach(h => { %>
+                  <tr>
+                    <td><code class="id-pill">#<%= h.enrollment_id %></code></td>
+                    <td style="font-weight: 600;"><%= h.student_name %> <span style="font-size: 0.82rem; color: var(--text-muted);">(@<%= h.username %>)</span></td>
+                    <td><%= h.course_title %></td>
+                    <td style="color: var(--text-muted); font-size: 0.85rem;">
+                      <%= h.reviewed_at ? new Date(h.reviewed_at).toLocaleString('vi-VN') : '---' %>
+                    </td>
+                    <td style="text-align: right;">
+                      <% if (h.status === 'approved') { %>
+                        <span class="pill-badge pill-success">Đã phê duyệt</span>
+                      <% } else { %>
+                        <span class="pill-badge" style="background: #fee2e2; color: #dc2626; border: 1px solid #fecaca;">Đã từ chối</span>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <tr>
+                  <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                    Chưa có lịch sử xét duyệt nào.
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+</body>
+</html>
+
