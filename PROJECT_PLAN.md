@@ -42,10 +42,25 @@
 - [x] **Giai đoạn 7:** Xây dựng module Quản lý Khóa học & Bài học (Admin & Giảng viên).
 - [x] **Giai đoạn 8:** Xây dựng module Học viên (Xem bài học, Đăng ký học, chống trùng lặp).
 - [x] **Giai đoạn 9:** Xây dựng module Tiến độ học tập & Dashboard thống kê (dữ liệu thật từ DB).
-- [x] **Giai đoạn 10:** Đóng gói Dockerfile (non-root) + Nginx SSL tự ký + phpMyAdmin + `docker-compose.yml` (network isolation) $\rightarrow$ **CHỐT VÀ PUSH COMMIT 1**.
+- [x] **Giai đoạn 10:** Đóng gói Dockerfile (non-root) + Nginx SSL tự ký + phpMyAdmin + `docker-compose.yml`.
+- [x] **Giai đoạn 10.1 (Tiêu chí 6 - Hardening Hệ thống Toàn diện):**
+  - Chạy container dưới user định danh giới hạn non-root `anlt` (UID 1000).
+  - Phân tách mạng nội bộ biệt lập (`webnet` và `dbnet` với cờ `internal: true` cô lập CSDL 100% khỏi Internet).
+  - Áp dụng nguyên tắc đặc quyền tối thiểu (Least Privilege) trong CSDL: `REVOKE ALL`, chỉ cấp `SELECT, INSERT, UPDATE, DELETE` cho `lms_user`.
+  - Cấu hình 6 Security Headers trên Nginx (HSTS, CSP, X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy).
+  - Mật khẩu mạnh, băm mật khẩu tài khoản bằng Bcrypt, an toàn biến môi trường 12-factor `.env`.
+- [x] **Giai đoạn 10.2:** Viết tài liệu `README.md` hướng dẫn toàn diện và **CHỐT PUSH COMMIT 1/3 LÊN GITHUB (Mã: `e08047c`)**.
 
 #### 🟡 CHẶNG 2: HỆ THỐNG GIÁM SÁT PROMETHEUS + GRAFANA (Mục tiêu: 1.5 Điểm - Tiêu chí 4)
-- [ ] **Giai đoạn 11:** Tích hợp Prometheus + cAdvisor + Node Exporter + MySQL Exporter + Nginx Exporter + Dashboard Grafana $\rightarrow$ **CHỐT VÀ PUSH COMMIT 2**.
+- [x] **Giai đoạn 11 (Tiêu chí 4 - Giám sát Container / Web / DB):**
+  - Cấu hình file `prometheus/prometheus.yml` với chu kỳ scrape 15s cho 5 jobs.
+  - Tích hợp thư viện `prom-client` vào ứng dụng Node.js Express (`lms_app`), mở endpoint `/metrics` đo HTTP request count, latency và V8 heap memory.
+  - Tích hợp `cAdvisor` (Google) giám sát thời gian thực CPU, RAM của từng container Docker.
+  - Tích hợp `node_exporter` giám sát tài nguyên máy chủ Linux (CPU load, RAM free, Disk space, Uptime).
+  - Tích hợp `mysql_exporter` kết nối MySQL qua file cấu hình `my.cnf` giám sát số kết nối, QPS và slow queries.
+  - Tích hợp `grafana` với cơ chế tự động nạp (Provisioning) Datasource Prometheus và Dashboard JSON 4-trong-1 `LMS Hệ Thống Giám Sát Toàn Diện`.
+  - Thiết lập phân tách mạng riêng `monitor_net` trong `docker-compose.yml`.
+  - **CHỐT VÀ PUSH COMMIT 2/3 LÊN GITHUB**.
 
 #### 🟢 CHẶNG 3: HỆ THỐNG LOG LOKI + BÁO CÁO (Mục tiêu: 2.5 Điểm - Tiêu chí 5, 7)
 - [ ] **Giai đoạn 12:** Tích hợp Loki + Promtail, viết và kiểm thử 2-3 câu query LogQL $\rightarrow$ **CHỐT VÀ PUSH COMMIT 3**.

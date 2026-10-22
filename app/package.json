@@ -12,6 +12,7 @@
     "express": "^4.19.2",
     "express-session": "^1.18.0",
     "multer": "^2.4.0",
-    "mysql2": "^3.9.7"
+    "mysql2": "^3.9.7",
+    "prom-client": "^15.1.3"
   }
 }

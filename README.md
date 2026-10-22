@@ -49,7 +49,7 @@ Dự án được đóng gói container hóa toàn diện bằng **Docker & Dock
                       ┌──────────────────┴───────────────────┐
                       │    phpMyAdmin (lms_phpmyadmin)       │
                       │  - Port: 8080:80                     │
-                      │  - Network: dbnet                    │
+                      │  - Networks: webnet & dbnet          │
                       └──────────────────────────────────────┘
 ```
 
@@ -132,6 +132,9 @@ docker compose ps
 | :--- | :--- | :--- | :--- |
 | **Hệ thống LMS** | `https://lms.vn` hoặc `https://<IP_UBUNTU>` | HTTPS (Cổng 443, tự chuyển hướng từ 80) | Giao diện học tập, giảng dạy & quản trị |
 | **phpMyAdmin** | `http://<IP_UBUNTU>:8080` | HTTP (Cổng 8080) | Quản trị CSDL trực quan |
+| **Grafana Dashboard** | `http://<IP_UBUNTU>:3001` | HTTP (Cổng 3001) | Đăng nhập: `admin` / `admin` (Đầy đủ dashboard Container/Web/DB) |
+| **Prometheus Web UI** | `http://<IP_UBUNTU>:9090` | HTTP (Cổng 9090) | Bộ não giám sát, kiểm tra Target & PromQL |
+| **cAdvisor Web UI** | `http://<IP_UBUNTU>:8081` | HTTP (Cổng 8081) | Giám sát tài nguyên phần cứng Container |
 
 ### Danh sách tài khoản thử nghiệm hệ thống (Mật khẩu đã mã hóa Bcrypt trong DB):
 | Vai trò (Role) | Email đăng nhập | Mật khẩu | Chức năng chính |

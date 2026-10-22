@@ -4,7 +4,26 @@ require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const express = require('express');
 const session = require('express-session');
+const client = require('prom-client');
 const db = require('./src/config/db'); // Dùng pool kết nối chuẩn từ db.js
+
+// Khởi tạo Prometheus Registry & Default Metrics
+const collectDefaultMetrics = client.collectDefaultMetrics;
+collectDefaultMetrics({ prefix: 'lms_' });
+
+// Khởi tạo các Custom Metrics đo đạc HTTP
+const httpRequestDurationMicroseconds = new client.Histogram({
+  name: 'lms_http_request_duration_seconds',
+  help: 'Thời gian phản hồi HTTP request tính bằng giây',
+  labelNames: ['method', 'route', 'status_code'],
+  buckets: [0.01, 0.05, 0.1, 0.3, 0.5, 1, 2, 5]
+});
+
+const httpRequestsTotal = new client.Counter({
+  name: 'lms_http_requests_total',
+  help: 'Tổng số lượt HTTP requests đến hệ thống',
+  labelNames: ['method', 'route', 'status_code']
+});
 
 // Import các Router và Middleware
 const authRouter = require('./src/routes/auth.routes');
@@ -33,6 +52,30 @@ app.get('/favicon.ico', (req, res) => {
 // 3. Middlewares phân tích dữ liệu gửi lên
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// 3.1. Middleware tự động đo thời gian phản hồi và số lượng requests cho Prometheus
+app.use((req, res, next) => {
+  if (req.path === '/metrics') return next(); // Không đo chính trang metrics
+  const start = process.hrtime();
+  res.on('finish', () => {
+    const diff = process.hrtime(start);
+    const durationInSeconds = diff[0] + diff[1] / 1e9;
+    const route = req.route ? req.route.path : req.path;
+    httpRequestsTotal.inc({ method: req.method, route: route, status_code: res.statusCode });
+    httpRequestDurationMicroseconds.observe({ method: req.method, route: route, status_code: res.statusCode }, durationInSeconds);
+  });
+  next();
+});
+
+// Endpoint chuẩn Prometheus để Scraper kéo dữ liệu
+app.get('/metrics', async (req, res) => {
+  try {
+    res.set('Content-Type', client.register.contentType);
+    res.end(await client.register.metrics());
+  } catch (ex) {
+    res.status(500).end(ex);
+  }
+});
 
 // 4. Cấu hình Session (Quản lý phiên đăng nhập)
 app.use(session({

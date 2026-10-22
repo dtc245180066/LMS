@@ -1,0 +1,30 @@
+global:
+  scrape_interval: 15s     # Cứ 15 giây đi kéo số liệu 1 lần
+  evaluation_interval: 15s # Cứ 15 giây tính toán lại các quy tắc cảnh báo
+
+scrape_configs:
+  # 1. Tự giám sát chính bộ não Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # 2. Giám sát Máy chủ Linux (Host OS: CPU, RAM, Disk) qua Node Exporter
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['node_exporter:9100']
+
+  # 3. Giám sát từng Container Docker (cAdvisor của Google)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  # 4. Giám sát Cơ sở dữ liệu MySQL (MySQL Exporter)
+  - job_name: 'mysql'
+    static_configs:
+      - targets: ['mysql_exporter:9104']
+
+  # 5. Giám sát Ứng dụng Web LMS (Node.js)
+  - job_name: 'lms_app'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['app:3000']
