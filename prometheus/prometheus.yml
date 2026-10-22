@@ -1,6 +1,9 @@
 global:
   scrape_interval: 15s     # Cứ 15 giây đi kéo số liệu 1 lần
-  evaluation_interval: 15s # Cứ 15 giây tính toán lại các quy tắc cảnh báo
+  evaluation_interval: 5s  # Cứ 5 giây tính toán lại các quy tắc cảnh báo để phản ứng tức thời
+
+rule_files:
+  - '/etc/prometheus/alert_rules.yml'
 
 scrape_configs:
   # 1. Tự giám sát chính bộ não Prometheus

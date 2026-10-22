@@ -132,9 +132,10 @@ docker compose ps
 | :--- | :--- | :--- | :--- |
 | **Hệ thống LMS** | `https://lms.vn` hoặc `https://<IP_UBUNTU>` | HTTPS (Cổng 443, tự chuyển hướng từ 80) | Giao diện học tập, giảng dạy & quản trị |
 | **phpMyAdmin** | `http://<IP_UBUNTU>:8080` | HTTP (Cổng 8080) | Quản trị CSDL trực quan |
-| **Grafana Dashboard** | `http://<IP_UBUNTU>:3001` | HTTP (Cổng 3001) | Đăng nhập: `admin` / `admin` (Đầy đủ dashboard Container/Web/DB) |
+| **Grafana Dashboard** | `http://<IP_UBUNTU>:3001` | HTTP (Cổng 3001) | Đăng nhập: `admin` / `admin` (Metrics & Logs trực quan) |
 | **Prometheus Web UI** | `http://<IP_UBUNTU>:9090` | HTTP (Cổng 9090) | Bộ não giám sát, kiểm tra Target & PromQL |
 | **cAdvisor Web UI** | `http://<IP_UBUNTU>:8081` | HTTP (Cổng 8081) | Giám sát tài nguyên phần cứng Container |
+| **Loki Log Gateway** | `http://<IP_UBUNTU>:3100` | HTTP (Cổng 3100) | Cổng thu nhận & đánh chỉ mục log tập trung |
 
 ### Danh sách tài khoản thử nghiệm hệ thống (Mật khẩu đã mã hóa Bcrypt trong DB):
 | Vai trò (Role) | Email đăng nhập | Mật khẩu | Chức năng chính |
@@ -149,4 +150,34 @@ docker compose ps
 - **Commit 1/3 (Chặng 1):** `feat(infra): deploy LMS with Nginx HTTPS reverse proxy, MySQL 8.0, phpMyAdmin and network isolation`
 - **Commit 2/3 (Chặng 2):** `feat(monitoring): integrate Prometheus metrics, Grafana dashboards and container exporters`
 - **Commit 3/3 (Chặng 3):** `feat(logging): centralize logs with Loki, Promtail, LogQL queries and project documentation`
+
+---
+
+## 📊 7. Hệ thống Giám sát & Quản lý Nhật ký Tập trung (Tiêu chí 4 & 5 Barem)
+
+### 7.1. Kiến trúc Giám sát & Log Toàn diện
+Hệ thống sử dụng mô hình kết hợp **Prometheus + Grafana + Loki + Promtail**:
+* **Prometheus (Cổng 9090):** Thu thập định kỳ (chu kỳ 15s) số liệu định lượng (Metrics) từ 4 tầng:
+  1. *Tầng Máy chủ (Host OS):* `node_exporter` (Cổng 9100) — đo CPU, RAM, Disk, Uptime.
+  2. *Tầng Container Docker:* `cadvisor` (Cổng 8081:8080) — đo mức tiêu thụ CPU, RAM thời gian thực của 11 containers.
+  3. *Tầng Ứng dụng Web:* `prom-client` nhúng trong Node.js (`app:3000/metrics`) — đo HTTP request count, latency (histogram), V8 memory heap.
+  4. *Tầng Cơ sở dữ liệu:* `mysql_exporter` (Cổng 9104) — đo số kết nối đồng thời, QPS (Queries per second), Slow queries.
+* **Loki (Cổng 3100) & Promtail:** Hệ thống thu gom và lưu vết nhật ký tập trung siêu nhẹ (chỉ đánh chỉ mục labels theo luồng, tiết kiệm RAM gấp nhiều lần so với Elasticsearch). Promtail liên tục theo dõi (tail) các file:
+  * `/var/log/nginx/access.log` và `/var/log/nginx/error.log` từ Nginx.
+  * `/var/log/app/app.log` từ Ứng dụng LMS Node.js.
+* **Grafana (Cổng 3001):** Tự động liên kết cả 2 Datasources (`prometheus` và `loki`) và tích hợp Dashboard 5 tầng trực quan: Host $\rightarrow$ Containers $\rightarrow$ Web LMS $\rightarrow$ MySQL DB $\rightarrow$ Live Logs.
+
+### 7.2. Hướng dẫn Thực hành Truy vấn Nhật ký bằng LogQL (Tiêu chí 5 Barem)
+Trên giao diện Grafana (`http://<IP_UBUNTU>:3001`):
+1. Nhấp vào biểu tượng **Explore** (hình chiếc la bàn trên menu bên trái).
+2. Chọn Datasource là **Loki**.
+3. Nhập các câu truy vấn LogQL mẫu dưới đây và bấm **Run query**:
+
+| STT | Mục đích truy vấn | Câu lệnh LogQL | Giải thích bản chất |
+| :---: | :--- | :--- | :--- |
+| **1** | **Toàn bộ log truy cập Nginx** | `{job="nginx"}` | Lọc toàn bộ luồng log được gắn nhãn `job="nginx"` theo thời gian thực |
+| **2** | **Lọc các truy vấn HTTP quan tâm** | `{job="nginx"} \|= "302"` | Tìm kiếm các dòng log chứa mã phản hồi chuyển hướng (302) hoặc lỗi (404/500) |
+| **3** | **Lọc nhật ký ứng dụng LMS** | `{job="lms_app"}` | Theo dõi toàn bộ luồng log xuất ra từ mã nguồn Node.js Express |
+| **4** | **Lọc cảnh báo / lỗi ứng dụng** | `{job="lms_app"} \|= "WARN" or {job="lms_app"} \|= "ERROR"` | Bắt nhanh các ngoại lệ và lỗi nghiệp vụ trong hệ thống |
+| **5** | **Đo tần suất log (Log-to-Metric)** | `rate({job="nginx"}[1m])` | Đếm số lượng dòng log ghi nhận mỗi giây trong cửa sổ 1 phút |
 

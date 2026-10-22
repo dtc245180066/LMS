@@ -1,0 +1,13 @@
+[mysqld]
+# Ghi nhận nhật ký lỗi hệ thống MySQL
+log_error = /var/log/mysql/error.log
+
+# Ghi nhận toàn bộ câu lệnh truy vấn SQL (General Query Log)
+general_log = 1
+general_log_file = /var/log/mysql/general.log
+
+# Ghi nhận các truy vấn chạy chậm > 1 giây (Slow Query Log)
+slow_query_log = 1
+slow_query_log_file = /var/log/mysql/slow.log
+long_query_time = 1
+

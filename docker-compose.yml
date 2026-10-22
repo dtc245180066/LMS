@@ -14,6 +14,8 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./database:/docker-entrypoint-initdb.d:ro
+      - ./mysql/logging.cnf:/etc/mysql/conf.d/logging.cnf:ro
+      - ./mysql/logs:/var/log/mysql
     networks:
       - dbnet
 
@@ -36,6 +38,7 @@ services:
       SESSION_SECRET: ${SESSION_SECRET}
     volumes:
       - ./app/public/uploads:/home/anlt/app/public/uploads
+      - ./app/logs:/home/anlt/app/logs
     networks:
       - webnet
       - dbnet
@@ -55,6 +58,7 @@ services:
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/logs:/var/log/nginx
     networks:
       - webnet
     depends_on:
@@ -146,6 +150,7 @@ services:
     restart: always
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alert_rules.yml:/etc/prometheus/alert_rules.yml:ro
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -185,10 +190,45 @@ services:
     depends_on:
       - prometheus
 
+  # ============================================================================
+  # 10. HỆ THỐNG GHI NHẬN NHẬT KÝ TẬP TRUNG (GRAFANA LOKI)
+  # ============================================================================
+  loki:
+    image: grafana/loki:latest
+    container_name: lms_loki
+    restart: always
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki/local-config.yaml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - monitor_net
+
+  # ============================================================================
+  # 11. NHÂN VIÊN THU GOM LOG TẬP TRUNG (PROMTAIL)
+  # ============================================================================
+  promtail:
+    image: grafana/promtail:latest
+    container_name: lms_promtail
+    restart: always
+    volumes:
+      - ./promtail/config.yaml:/etc/promtail/config.yaml:ro
+      - ./nginx/logs:/var/log/nginx:ro
+      - ./app/logs:/var/log/app:ro
+      - ./mysql/logs:/var/log/mysql:ro
+    command: -config.file=/etc/promtail/config.yaml
+    networks:
+      - monitor_net
+    depends_on:
+      - loki
+
 volumes:
   db_data:
   prometheus_data:
   grafana_data:
+  loki_data:
 
 networks:
   webnet:

@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 // 1. Đọc file .env ở thư mục gốc
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
@@ -6,6 +7,12 @@ const express = require('express');
 const session = require('express-session');
 const client = require('prom-client');
 const db = require('./src/config/db'); // Dùng pool kết nối chuẩn từ db.js
+
+// Tạo thư mục logs nếu chưa tồn tại
+const logDir = path.join(__dirname, 'logs');
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir, { recursive: true });
+}
 
 // Khởi tạo Prometheus Registry & Default Metrics
 const collectDefaultMetrics = client.collectDefaultMetrics;
@@ -25,6 +32,13 @@ const httpRequestsTotal = new client.Counter({
   labelNames: ['method', 'route', 'status_code']
 });
 
+// Metric đếm số lần đăng nhập thất bại (Dùng để phát hiện Brute-force & Alerting)
+const authFailedTotal = new client.Counter({
+  name: 'lms_auth_failed_total',
+  help: 'Tổng số lần đăng nhập thất bại (Security Brute-force Detection)',
+  labelNames: ['username']
+});
+
 // Import các Router và Middleware
 const authRouter = require('./src/routes/auth.routes');
 const studentRouter = require('./src/routes/student.routes');
@@ -37,6 +51,7 @@ const setCurrentUser = require('./src/middlewares/viewLocals');
 const { getPagination } = require('./src/utils/pagination');
 
 const app = express();
+app.locals.authFailedTotal = authFailedTotal;
 const PORT = process.env.APP_PORT || 3000;
 
 // 2. Cấu hình giao diện EJS và thư mục tĩnh (Static Files)
@@ -53,7 +68,7 @@ app.get('/favicon.ico', (req, res) => {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// 3.1. Middleware tự động đo thời gian phản hồi và số lượng requests cho Prometheus
+// 3.1. Middleware tự động đo thời gian phản hồi và số lượng requests cho Prometheus & ghi log cho Loki
 app.use((req, res, next) => {
   if (req.path === '/metrics') return next(); // Không đo chính trang metrics
   const start = process.hrtime();
@@ -63,6 +78,12 @@ app.use((req, res, next) => {
     const route = req.route ? req.route.path : req.path;
     httpRequestsTotal.inc({ method: req.method, route: route, status_code: res.statusCode });
     httpRequestDurationMicroseconds.observe({ method: req.method, route: route, status_code: res.statusCode }, durationInSeconds);
+
+    // Ghi nhật ký tập trung ra file cho Promtail thu gom đẩy về Loki
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+    const logLevel = res.statusCode >= 500 ? 'ERROR' : res.statusCode >= 400 ? 'WARN' : 'INFO';
+    const logLine = `[${new Date().toISOString()}] ${logLevel} [HTTP] ${req.method} ${req.originalUrl} status=${res.statusCode} duration=${(durationInSeconds * 1000).toFixed(1)}ms ip=${clientIp}\n`;
+    fs.appendFile(path.join(logDir, 'app.log'), logLine, () => {});
   });
   next();
 });
@@ -109,6 +130,7 @@ app.get('/', (req, res) => {
 
 // Gắn các nhánh chức năng chuyên biệt theo vai trò
 app.use('/auth', authRouter);
+app.use('/api/auth', authRouter);
 app.use('/student', studentRouter);
 app.use('/instructor', instructorRouter);
 app.use('/admin', adminRouter);

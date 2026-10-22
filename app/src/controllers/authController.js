@@ -1,6 +1,19 @@
 const bcrypt = require('bcryptjs');
+const fs = require('fs');
+const path = require('path');
 const db = require('../config/db');
 const { logActivity } = require('../utils/activityLogger');
+
+// Ghi nhận sự kiện đăng nhập thất bại cho Prometheus Alerting & Loki Forensics
+const recordFailedLogin = async (req, username) => {
+    if (req.app.locals && req.app.locals.authFailedTotal) {
+        req.app.locals.authFailedTotal.inc({ username: username || 'unknown' });
+    }
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+    const logLine = `[${new Date().toISOString()}] WARN [AUTH] Failed login attempt for user '${username}' from IP ${clientIp}\n`;
+    const logPath = path.join(__dirname, '../../logs/app.log');
+    fs.appendFile(logPath, logLine, () => {});
+};
 
 // 1. Hiển thị trang đăng nhập
 const renderLogin = (req, res) => {
@@ -32,9 +45,15 @@ const login = async (req, res, next) => {
         const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
         const user = rows[0];
 
+        const isJson = req.headers['content-type']?.includes('application/json') || req.originalUrl?.includes('/api/') || req.xhr;
+
         if (!user) {
             await logActivity(null, `POST /auth/login (401 Unauthorized - user not found)`);
-            return res.render('auth/login', { 
+            await recordFailedLogin(req, username);
+            if (isJson) {
+                return res.status(401).json({ success: false, message: 'Tên đăng nhập hoặc mật khẩu không chính xác!' });
+            }
+            return res.status(401).render('auth/login', { 
                 title: 'Đăng nhập', 
                 error: 'Tên đăng nhập hoặc mật khẩu không chính xác!' 
             });
@@ -44,7 +63,11 @@ const login = async (req, res, next) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             await logActivity(user.id, `POST /auth/login (401 Unauthorized - invalid password)`);
-            return res.render('auth/login', { 
+            await recordFailedLogin(req, username);
+            if (isJson) {
+                return res.status(401).json({ success: false, message: 'Tên đăng nhập hoặc mật khẩu không chính xác!' });
+            }
+            return res.status(401).render('auth/login', { 
                 title: 'Đăng nhập', 
                 error: 'Tên đăng nhập hoặc mật khẩu không chính xác!' 
             });
@@ -69,6 +92,10 @@ const login = async (req, res, next) => {
 
         // Ghi nhật ký hoạt động
         await logActivity(user.id, `POST /auth/login (200 OK)`);
+
+        if (isJson) {
+            return res.status(200).json({ success: true, message: 'Đăng nhập thành công!', user: req.session.user });
+        }
 
         req.session.save(() => {
             if (user.role === 'admin') {

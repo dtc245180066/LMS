@@ -299,7 +299,7 @@
       "type": "timeseries",
       "gridPos": {
         "h": 6,
-        "w": 12,
+        "w": 8,
         "x": 0,
         "y": 15
       },
@@ -333,8 +333,8 @@
       "type": "timeseries",
       "gridPos": {
         "h": 6,
-        "w": 12,
-        "x": 12,
+        "w": 8,
+        "x": 8,
         "y": 15
       },
       "fieldConfig": {
@@ -500,6 +500,149 @@
         "type": "prometheus",
         "uid": "prometheus"
       }
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 28
+      },
+      "id": 500,
+      "title": "📜 5. NHẬT KÝ HỆ THỐNG TẬP TRUNG (GRAFANA LOKI LOGS)",
+      "type": "row"
+    },
+    {
+      "id": 12,
+      "title": "Nginx Access & Error Logs (Thời gian thực)",
+      "type": "logs",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 29
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "options": {
+        "showLabels": false,
+        "wrapLogMessage": true,
+        "enableLogDetails": true,
+        "sortOrder": "Descending"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "{job=\"nginx\"}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "title": "Ứng dụng LMS Node.js Logs (Thời gian thực)",
+      "type": "logs",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 29
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "options": {
+        "showLabels": false,
+        "wrapLogMessage": true,
+        "enableLogDetails": true,
+        "sortOrder": "Descending"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "{job=\"lms_app\"}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "title": "🚨 Cảnh Báo An Ninh: Tấn Công Brute-Force",
+      "type": "stat",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 15
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 3
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "HỆ THỐNG AN TOÀN"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "from": 3,
+                "result": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "🚨 FIRING: ĐANG BỊ TẤN CÔNG!"
+                },
+                "to": 99999
+              },
+              "type": "range"
+            }
+          ]
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(increase(lms_auth_failed_total[1m])) or vector(0)",
+          "legendFormat": "Số lần thử sai/phút"
+        }
+      ]
     }
   ],
   "refresh": "5s",

@@ -1,0 +1,43 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # 1. Thu thập Access log & Error log của Nginx Reverse Proxy
+  - job_name: nginx
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          service: lms_nginx
+          container: nginx
+          __path__: /var/log/nginx/*.log
+
+  # 2. Thu thập App log của Ứng dụng LMS (Node.js Express)
+  - job_name: lms_app
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: lms_app
+          service: lms_app
+          container: app
+          __path__: /var/log/app/*.log
+
+  # 3. Thu thập General log, Error log & Slow query log của CSDL MySQL 8.0
+  - job_name: mysql
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: mysql
+          service: lms_db
+          container: mysql
+          __path__: /var/log/mysql/*.log

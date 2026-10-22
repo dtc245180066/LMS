@@ -63,7 +63,7 @@
   - **CHỐT VÀ PUSH COMMIT 2/3 LÊN GITHUB**.
 
 #### 🟢 CHẶNG 3: HỆ THỐNG LOG LOKI + BÁO CÁO (Mục tiêu: 2.5 Điểm - Tiêu chí 5, 7)
-- [ ] **Giai đoạn 12:** Tích hợp Loki + Promtail, viết và kiểm thử 2-3 câu query LogQL $\rightarrow$ **CHỐT VÀ PUSH COMMIT 3**.
+- [x] **Giai đoạn 12:** Tích hợp Loki + Promtail, viết và kiểm thử 2-3 câu query LogQL $\rightarrow$ **CHỐT VÀ PUSH COMMIT 3**.
 - [ ] **Giai đoạn 13:** Kiểm thử toàn diện, viết `README.md` và hoàn thiện Báo cáo tổng hợp $\ge 10$ trang.
 
 ---

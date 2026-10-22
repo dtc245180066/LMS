@@ -1,0 +1,12 @@
+groups:
+  - name: lms_security_alerts
+    rules:
+      - alert: BruteForceLoginDetected
+        expr: sum(increase(lms_auth_failed_total[1m])) >= 3
+        for: 0s
+        labels:
+          severity: critical
+          alertname: BruteForceLoginDetected
+        annotations:
+          summary: "Phát hiện tấn công dò quét mật khẩu (Brute-Force Attack)"
+          description: "Số lần đăng nhập thất bại vượt ngưỡng (Ghi nhận: {{ $value }} lần/phút). Trạng thái: FIRING."
